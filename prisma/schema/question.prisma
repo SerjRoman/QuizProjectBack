@@ -1,0 +1,8 @@
+model Question {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  type      String
+  data      Json
+  createdAt DateTime @default(now())
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  quizId    String   @db.ObjectId
+}

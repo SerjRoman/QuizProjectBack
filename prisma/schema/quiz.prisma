@@ -1,0 +1,6 @@
+model Quiz {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  questions Question[]
+  createdAt DateTime   @default(now())
+}
