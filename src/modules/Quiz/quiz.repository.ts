@@ -1,22 +1,79 @@
-import { Quiz } from '@prisma/client';
+import { PrismaKnownError } from '#types/prisma';
+import { NotFoundError, PrismaErrors } from 'src/errors/app-errors';
 import client from '../../prisma/client';
-import { Result } from '../../types/result';
-import { failure, success } from '../../utils/result';
+import type { QuizRepository as QRType } from './quiz.types';
 
-export const QuizRepository = {
-    getById: async function (id: string): Promise<Result<Quiz, string>> {
-        const quiz = await client.quiz.findUnique({
-            where: { id: id },
-            include: {
-                questions: true
+export const QuizRepository: QRType = {
+    getById: async function (id, include, omit) {
+        try {
+            const quiz = await client.quiz.findUniqueOrThrow({
+                where: { id: id },
+                include: include,
+                omit: omit,
+            });
+            return quiz;
+        } catch (error) {
+            if (error instanceof PrismaKnownError) {
+                switch (error.code) {
+                    case PrismaErrors.NOT_FOUND:
+                        throw new NotFoundError('Quiz');
+                    default:
+                        throw error;
+                }
             }
-        });
-        if (!quiz) {
-            return failure('Quiz not found');
+            throw error;
         }
-        return success(quiz);
     },
-    getByIdWithQuestions: async function (id: string): Promise<Result<Quiz, string>> {
-
-    }
+    getAll: async function (include, omit) {
+        try {
+            return await client.quiz.findMany({
+                include,
+                omit,
+            });
+        } catch (error) {
+            if (error instanceof PrismaKnownError) {
+                switch (error.code) {
+                    case PrismaErrors.NOT_FOUND:
+                        throw new NotFoundError('Quiz');
+                    default:
+                        throw error;
+                }
+            }
+            throw error;
+        }
+    },
+    create: async function (data) {
+        try {
+            return await client.quiz.create({
+                data,
+            });
+        } catch (error) {
+            if (error instanceof PrismaKnownError) {
+                switch (error.code) {
+                    case PrismaErrors.CONFLICT:
+                        throw new NotFoundError('Quiz');
+                    default:
+                        throw error;
+                }
+            }
+            throw error;
+        }
+    },
+    delete: async function (id) {
+        try {
+            return await client.quiz.delete({
+                where: { id },
+            });
+        } catch (error) {
+            if (error instanceof PrismaKnownError) {
+                switch (error.code) {
+                    case PrismaErrors.CONFLICT:
+                        throw new NotFoundError('Quiz');
+                    default:
+                        throw error;
+                }
+            }
+            throw error;
+        }
+    },
 };

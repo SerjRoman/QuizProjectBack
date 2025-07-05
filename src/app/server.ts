@@ -1,11 +1,11 @@
 import app from '.';
-import { HOST, PORT } from '../config/config';
+import { env } from '../config/env.config';
 import client from '../prisma/client';
 
 async function startServer() {
     try {
-        app.listen(PORT, HOST, () => {
-            console.log(`Server started http://localhost:3000`);
+        app.listen(env.PORT, env.HOST, () => {
+            console.log(`Server started http://${env.HOST}:${env.PORT}`);
         });
         await client.$connect();
     } catch (error) {

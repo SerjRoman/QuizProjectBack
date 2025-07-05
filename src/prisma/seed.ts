@@ -1,6 +1,5 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../generated/prisma';
 import client from './client';
-import { QuestionCreateInput } from '../types/question.types';
 
 async function createQuiz(data: Prisma.QuizCreateInput) {
     const quiz = await client.quiz.create({ data: data });
@@ -33,7 +32,6 @@ async function findQuestion(where: Prisma.QuestionWhereUniqueInput) {
     console.dir(`Found one ${JSON.stringify(question)}`);
 }
 
-createQuiz({ title: 'First test quiz', questions: { connect: { data: {} } });
 // createQuestion({
 //     type: 'singleChoice',
 //     data: {},
