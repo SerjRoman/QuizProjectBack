@@ -6,14 +6,14 @@
     "schema": "./prisma"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register ./src/app/server.ts",
     "prisma:generate": "prisma generate",
     "prisma:seed": "ts-node ./src/prisma/seed.ts",
     "prisma:migrate": "prisma db push",
     "lint": "eslint 'src/**/*.ts' --fix",
     "lint:check": "eslint 'src/**/*.ts'",
-    "format": "prettier --write 'src/**/*.ts'"
+    "format": "prettier --write 'src/**/*.ts'",
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -39,6 +39,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@faker-js/faker": "^9.9.0",
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^6.0.3",
     "@typescript-eslint/eslint-plugin": "^8.18.2",
     "@typescript-eslint/parser": "^8.18.2",
     "eslint": "^9.17.0",
@@ -47,7 +50,10 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.14.0",
+    "jest": "^30.0.4",
     "prettier": "^3.4.2",
+    "supertest": "^7.1.1",
+    "ts-jest": "^29.4.0",
     "tsconfig-paths": "^4.2.0",
     "typescript-eslint": "^8.18.2"
   }

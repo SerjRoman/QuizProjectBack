@@ -1,5 +1,5 @@
 import { PrismaKnownError } from '#types/prisma';
-import { NotFoundError, PrismaErrors } from 'src/errors/app-errors';
+import { NotFoundError, PrismaErrors } from '@src/errors/app-errors';
 import client from '../../prisma/client';
 import type { QuizRepository as QRType } from './quiz.types';
 
