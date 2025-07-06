@@ -1,13 +1,13 @@
 model Question {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
   type      QuestionType
   data      Json
-  createdAt DateTime @default(now())
-  quiz      Quiz     @relation(fields: [quizId], references: [id])
-  quizId    String   @db.ObjectId
+  createdAt DateTime     @default(now())
+  quiz      Quiz         @relation(fields: [quizId], references: [id])
+  quizId    String       @db.ObjectId
 }
 
 enum QuestionType {
-    multiChoice @map("multiChoice")
-    singleChoice @map("singleChoice")
+  multiChoice  
+  singleChoice 
 }

@@ -1,9 +1,9 @@
 import { PrismaKnownError } from '#types/prisma';
 import { NotFoundError, PrismaErrors } from '@src/errors/app-errors';
 import client from '../../prisma/client';
-import type { QuizRepository as QRType } from './quiz.types';
+import type { IQuizRepository } from './quiz.types';
 
-export const QuizRepository: QRType = {
+export const QuizRepository: IQuizRepository = {
     getById: async function (id, include, omit) {
         try {
             const quiz = await client.quiz.findUniqueOrThrow({

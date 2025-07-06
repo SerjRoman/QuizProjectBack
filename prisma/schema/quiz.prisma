@@ -3,4 +3,9 @@ model Quiz {
   title     String
   questions Question[]
   createdAt DateTime   @default(now())
+
+  TeacherCreated   TeacherProfile? @relation(fields: [TeacherCreatedId], references: [id])
+  TeacherCreatedId String?         @db.ObjectId
+  StudentAttempted   StudentProfile? @relation(fields: [StudentAttemptedId], references: [id])
+  StudentAttemptedId String?         @db.ObjectId
 }

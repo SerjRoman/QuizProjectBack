@@ -1,11 +1,7 @@
 import { QuizService } from './quiz.service';
-import type {
-    QuizController as QCType,
-    QuizInclude,
-    QuizOmit,
-} from './quiz.types';
+import type { IQuizController, QuizInclude, QuizOmit } from './quiz.types';
 
-export const QuizController: QCType = {
+export const QuizController: IQuizController = {
     getAll: async function (req, res, next) {
         try {
             const include: QuizInclude = {};
@@ -24,7 +20,7 @@ export const QuizController: QCType = {
                 }
             }
             console.log(req.query);
-            res.json(await QuizService.getAll(include, omit));
+            res.status(200).json(await QuizService.getAll(include, omit));
         } catch (e) {
             next(e);
         }
@@ -47,21 +43,21 @@ export const QuizController: QCType = {
                     });
                 }
             }
-            res.json(await QuizService.getById(id, include, omit));
+            res.status(200).json(await QuizService.getById(id, include, omit));
         } catch (e) {
             next(e);
         }
     },
     create: async function (req, res, next) {
         try {
-            res.json(await QuizService.create(req.body));
+            res.status(201).json(await QuizService.create(req.body));
         } catch (error) {
             next(error);
         }
     },
     delete: async function (req, res, next) {
         try {
-            res.json(await QuizService.delete(req.params.id));
+            res.status(204).json(await QuizService.delete(req.params.id));
         } catch (error) {
             next(error);
         }

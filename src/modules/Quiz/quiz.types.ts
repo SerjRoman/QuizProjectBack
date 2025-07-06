@@ -28,7 +28,7 @@ export type QuizWithArgs<
     O extends QuizOmit = object,
 > = Prisma.QuizGetPayload<{ omit: O; include: I }>;
 
-export type QuizController = {
+export interface IQuizController {
     getAll: (
         req: AuthRequest<
             object,
@@ -46,7 +46,7 @@ export type QuizController = {
             object,
             InferType<typeof QuizSchema.getById>['query']
         >,
-        res: AuthResponse<QuizWithArgs>,
+        res: AuthResponse<QuizWithArgs | null>,
         next: NextFunction,
     ) => void;
     delete: (
@@ -63,8 +63,8 @@ export type QuizController = {
         res: AuthResponse<QuizCreateInput>,
         next: NextFunction,
     ) => void;
-};
-export type QuizService = {
+}
+export interface IQuizService {
     getAll: (
         include: QuizInclude,
         omit: QuizOmit,
@@ -73,13 +73,13 @@ export type QuizService = {
         id: string,
         include: QuizInclude,
         omit: QuizOmit,
-    ) => Promise<QuizWithArgs<QuizInclude, QuizOmit>>;
+    ) => Promise<QuizWithArgs<QuizInclude, QuizOmit> | null>;
     delete: (id: string) => Promise<Quiz>;
     create: (data: QuizCreateInput) => Promise<Quiz>;
     // update: (data: )
-};
+}
 
-export type QuizRepository = {
+export interface IQuizRepository {
     getAll: <I extends QuizInclude, O extends QuizOmit>(
         include: I,
         omit: O,
@@ -88,7 +88,7 @@ export type QuizRepository = {
         id: string,
         include: I,
         omit: O,
-    ) => Promise<QuizWithArgs<I, O>>;
+    ) => Promise<QuizWithArgs<I, O> | null>;
     delete: (id: string) => Promise<Quiz>;
     create: (data: QuizCreateInput) => Promise<Quiz>;
-};
+}

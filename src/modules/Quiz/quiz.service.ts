@@ -1,7 +1,7 @@
 import { QuizRepository } from './quiz.repository';
-import type { QuizService as QSType } from './quiz.types';
+import type { IQuizService } from './quiz.types';
 
-export const QuizService: QSType = {
+export const QuizService: IQuizService = {
     getAll: async (include, omit) => {
         return await QuizRepository.getAll<typeof include, typeof omit>(
             include,

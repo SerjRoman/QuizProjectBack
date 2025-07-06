@@ -11,4 +11,7 @@ export const env = cleanEnv(process.env, {
         choices: ['development', 'production'],
         default: 'development',
     }),
+    REFRESH_SECRET_KEY: str(),
+    JWT_EXPIRES_IN: str(),
+    REFRESH_JWT_EXPIRES_IN: str(),
 });

@@ -8,5 +8,5 @@ export type AuthRequest<
 > = Request<P, ResBody, ReqBody, ReqQuery, { userId: number }>;
 export type AuthResponse<ResBody = object> = Response<
     ResBody,
-    { userId: number }
+    { userId: string }
 >;
