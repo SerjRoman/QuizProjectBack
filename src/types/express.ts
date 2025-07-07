@@ -5,7 +5,7 @@ export type AuthRequest<
     ResBody = object,
     ReqBody = object,
     ReqQuery = Query,
-> = Request<P, ResBody, ReqBody, ReqQuery, { userId: number }>;
+> = Request<P, ResBody, ReqBody, ReqQuery, { userId: string }>;
 export type AuthResponse<ResBody = object> = Response<
     ResBody,
     { userId: string }

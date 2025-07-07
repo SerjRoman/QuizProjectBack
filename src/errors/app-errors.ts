@@ -1,8 +1,10 @@
 export class AppError extends Error {
     public readonly statusCode: number;
-    constructor(message: string, code: number) {
+    public readonly errorCode?: string;
+    constructor(message: string, code: number, errorCode?: string) {
         super(message);
         this.statusCode = code;
+        this.errorCode = errorCode;
         Object.setPrototypeOf(this, new.target.prototype);
     }
 }
@@ -26,6 +28,11 @@ export class ConflictError extends AppError {
 export class ValidationError extends AppError {
     constructor(message: string) {
         super(`Validation error: ${message}`, 422);
+    }
+}
+export class AuthenticationError extends AppError {
+    constructor(message: string, errorCode?: string) {
+        super(`Authentication error: ${message}`, 401, errorCode);
     }
 }
 export enum PrismaErrors {

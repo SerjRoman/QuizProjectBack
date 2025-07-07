@@ -46,7 +46,7 @@ export interface IQuizController {
             object,
             InferType<typeof QuizSchema.getById>['query']
         >,
-        res: AuthResponse<QuizWithArgs | null>,
+        res: AuthResponse<QuizWithArgs>,
         next: NextFunction,
     ) => void;
     delete: (
@@ -73,7 +73,7 @@ export interface IQuizService {
         id: string,
         include: QuizInclude,
         omit: QuizOmit,
-    ) => Promise<QuizWithArgs<QuizInclude, QuizOmit> | null>;
+    ) => Promise<QuizWithArgs<QuizInclude, QuizOmit>>;
     delete: (id: string) => Promise<Quiz>;
     create: (data: QuizCreateInput) => Promise<Quiz>;
     // update: (data: )
@@ -88,7 +88,7 @@ export interface IQuizRepository {
         id: string,
         include: I,
         omit: O,
-    ) => Promise<QuizWithArgs<I, O> | null>;
+    ) => Promise<QuizWithArgs<I, O>>;
     delete: (id: string) => Promise<Quiz>;
     create: (data: QuizCreateInput) => Promise<Quiz>;
 }

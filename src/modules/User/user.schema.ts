@@ -1,5 +1,28 @@
 import * as yup from 'yup';
 
+const commonQueries = yup.object({
+    include: yup
+        .array()
+        .of(yup.string().oneOf(['TeacherProfile', 'StudentProfile']).required())
+        .optional(),
+    omit: yup
+        .array()
+        .of(
+            yup
+                .string()
+                .oneOf([
+                    'id',
+                    'createdAt',
+                    'username',
+                    'email',
+                    'role',
+                    'password',
+                ])
+                .required(),
+        )
+        .optional(),
+});
+
 export const UserSchema = {
     create: yup.object({
         body: yup.object({
@@ -26,39 +49,17 @@ export const UserSchema = {
         }),
     }),
     getById: yup.object({
-        query: yup
-            .object({
-                include: yup
-                    .array()
-                    .of(
-                        yup
-                            .string()
-                            .oneOf(['TeacherProfile', 'StudentProfile'])
-                            .required(),
-                    )
-                    .optional(),
-                omit: yup
-                    .array()
-                    .of(
-                        yup
-                            .string()
-                            .oneOf([
-                                'id',
-                                'createdAt',
-                                'username',
-                                'email',
-                                'role',
-                                'password',
-                            ])
-                            .required(),
-                    )
-                    .optional(),
-            })
-            .optional(),
+        query: commonQueries.optional(),
     }),
     refresh: yup.object({
         body: yup.object({
             refreshToken: yup.string().required(),
+        }),
+    }),
+    login: yup.object({
+        body: yup.object({
+            email: yup.string().required(),
+            password: yup.string().required(),
         }),
     }),
 };

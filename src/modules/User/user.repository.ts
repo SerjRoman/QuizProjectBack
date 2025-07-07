@@ -78,7 +78,7 @@ export const UserRepository: IUserRepository = {
     },
     getByEmail: async function (email, include, omit) {
         try {
-            const user = await client.user.findUnique({
+            const user = await client.user.findUniqueOrThrow({
                 where: { email: email },
                 include: include,
                 omit: omit,

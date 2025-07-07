@@ -13,11 +13,10 @@ export const parseJsonQueryMiddleware = (
             (value.startsWith('[') || value.startsWith('{'))
         ) {
             try {
-                // Пытаемся распарсить его
                 req.query[key] = JSON.parse(value);
             } catch (error) {
                 console.error(error);
-                next(error)
+                next(error);
             }
         }
     }

@@ -15,9 +15,9 @@ export type UserCreateInput = Prisma.UserUncheckedCreateInput;
 export type UserUpdateInput = Prisma.UserUncheckedUpdateInput;
 export type UserInclude = Prisma.UserInclude;
 export type UserOmit = Prisma.UserOmit;
+export type UserLoginPayload = Pick<User, 'email' | 'password'>;
 
 export interface IUserController {
-    service: IUserService;
     create: (
         req: Request<
             object,
@@ -25,7 +25,7 @@ export interface IUserController {
             InferType<typeof UserSchema.create>['body'],
             object
         >,
-        res: Response<{ token: string; refreshToken: string }>,
+        res: Response<User>,
         next: NextFunction,
     ) => void;
     getById: (
@@ -64,32 +64,62 @@ export interface IUserController {
         next: NextFunction,
     ) => void;
     refresh: (
-        req: AuthRequest<
+        req: Request<
             object,
-            object,
+            { token: string },
             InferType<typeof UserSchema.refresh>['body'],
             object
         >,
-        res: AuthResponse<{ token: string }>,
+        res: Response<{ token: string }>,
+        next: NextFunction,
+    ) => void;
+    logout: (req: AuthRequest, res: AuthResponse, next: NextFunction) => void;
+    register: (
+        req: Request<
+            object,
+            { token: string; refreshToken: string },
+            InferType<typeof UserSchema.create>['body'],
+            object
+        >,
+        res: Response<{ token: string; refreshToken: string }>,
+        next: NextFunction,
+    ) => void;
+    login: (
+        req: Request<
+            object,
+            User,
+            InferType<typeof UserSchema.login>['body'],
+            object
+        >,
+        res: Response<{ token: string; refreshToken: string }>,
         next: NextFunction,
     ) => void;
 }
 export interface IUserService {
     repo: IUserRepository;
-    create: (
+    create: (data: UserCreateInput) => Promise<User>;
+    register: (
         data: UserCreateInput,
+    ) => Promise<{ token: string; refreshToken: string }>;
+    login: (
+        data: UserLoginPayload,
     ) => Promise<{ token: string; refreshToken: string }>;
     getById: (
         id: string,
         include: UserInclude,
         omit: UserOmit,
-    ) => Promise<User | null>;
+    ) => Promise<User>;
     update: (id: string, data: UserUpdateInput) => Promise<User>;
     delete: (id: string) => Promise<User>;
     hashPassword: (password: string) => Promise<string>;
+    comparePasswords: (
+        hashedPassword: string,
+        password: string,
+    ) => Promise<boolean>;
     generateToken: (userId: string) => string;
     generateRefreshToken: (userId: string) => string;
     verifyRefreshToken: (refreshToken: string) => string;
+    verifyToken: (token: string) => string;
     refresh: (refreshToken: string) => string;
 }
 
@@ -99,12 +129,12 @@ export interface IUserRepository {
         id: string,
         include: I,
         omit: O,
-    ) => Promise<UserWithArgs<I, O> | null>;
+    ) => Promise<UserWithArgs<I, O>>;
     update: (id: string, data: UserUpdateInput) => Promise<User>;
     delete: (id: string) => Promise<User>;
-    getByEmail: (
+    getByEmail: <I extends UserInclude = object, O extends UserOmit = object>(
         email: string,
-        include: UserInclude,
-        omit: UserOmit,
-    ) => Promise<UserWithArgs<UserInclude, UserOmit> | null>;
+        include: I,
+        omit: O,
+    ) => Promise<UserWithArgs<I, O>>;
 }
