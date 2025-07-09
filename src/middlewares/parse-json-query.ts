@@ -10,13 +10,9 @@ export const parseJsonQueryMiddleware = (
 
         if (typeof value === 'string') {
             if (!isNaN(Number(value))) {
-                try {
-                    // req.query[key] = Number(value)
-                    req.query.limit = value;
-                } catch (error) {
-                    console.log(error);
-                    next(error);
-                }
+                // req.query[key] = Number(value);
+                req.query[key] = JSON.parse(value);
+                // req.query.limit = value;
             }
 
             if (value.startsWith('[') || value.startsWith('{')) {

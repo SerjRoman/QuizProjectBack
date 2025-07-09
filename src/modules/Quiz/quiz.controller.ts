@@ -21,13 +21,12 @@ export const QuizController: IQuizController = {
                     });
                 }
                 if (query.limit) {
-                    limit = Number(query.limit);
+                    limit = query.limit;
                 }
                 if (query.offset) {
-                    offset = Number(query.offset);
+                    offset = query.offset;
                 }
             }
-            console.log(req.query);
             res.status(200).json(
                 await QuizService.getAll(include, omit, limit, offset),
             );

@@ -5,6 +5,6 @@ import { QuizRoutes } from '@src/modules/Quiz/';
 const AppRouter = Router();
 
 AppRouter.use('/users', UserRoutes);
-AppRouter.use('/quizes', QuizRoutes);
+AppRouter.use('/quizzes', QuizRoutes);
 
 export { AppRouter };
