@@ -7,8 +7,8 @@ export const QuizController: IQuizController = {
             const include: QuizInclude = {};
             const omit: QuizOmit = {};
             const query = req.query;
-            const limit = parseInt(req.query?.limit as string) || 100;
-            const offset = parseInt(req.query?.offset as string) || 0;
+            let limit: number | undefined;
+            let offset: number | undefined;
             if (query) {
                 if (query.include) {
                     query.include.forEach((q) => {
@@ -20,11 +20,11 @@ export const QuizController: IQuizController = {
                         omit[q] = true;
                     });
                 }
-                if (limit) {
-                    limit;
+                if (query.limit) {
+                    limit = Number(query.limit);
                 }
-                if (offset) {
-                    offset;
+                if (query.offset) {
+                    offset = Number(query.offset);
                 }
             }
             console.log(req.query);
