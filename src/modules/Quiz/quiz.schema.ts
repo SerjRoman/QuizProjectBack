@@ -9,6 +9,8 @@ const commonQuizQuerySchema = yup.object({
         .array()
         .of(yup.string().oneOf(['id', 'title', 'createdAt']).required())
         .optional(),
+    limit: yup.number().optional(),
+    offset: yup.number().optional(),
 });
 
 export const QuizSchema = {

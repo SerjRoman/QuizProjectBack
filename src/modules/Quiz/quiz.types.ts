@@ -68,6 +68,8 @@ export interface IQuizService {
     getAll: (
         include: QuizInclude,
         omit: QuizOmit,
+        limit?: number,
+        offset?: number,
     ) => Promise<QuizWithArgs<QuizInclude, QuizOmit>[]>;
     getById: (
         id: string,
@@ -83,6 +85,8 @@ export interface IQuizRepository {
     getAll: <I extends QuizInclude, O extends QuizOmit>(
         include: I,
         omit: O,
+        limit?: number,
+        offset?: number,
     ) => Promise<QuizWithArgs<I, O>[]>;
     getById: <I extends QuizInclude, O extends QuizOmit>(
         id: string,

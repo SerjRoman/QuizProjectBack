@@ -8,15 +8,20 @@ export const parseJsonQueryMiddleware = (
     for (const key in req.query) {
         const value = req.query[key];
 
-        if (
-            typeof value === 'string' &&
-            (value.startsWith('[') || value.startsWith('{'))
-        ) {
-            try {
+        if (typeof value === 'string') {
+            if (!isNaN(Number(value))) {
+                // req.query[key] = Number(value);
                 req.query[key] = JSON.parse(value);
-            } catch (error) {
-                console.error(error);
-                next(error);
+                // req.query.limit = value;
+            }
+
+            if (value.startsWith('[') || value.startsWith('{')) {
+                try {
+                    req.query[key] = JSON.parse(value);
+                } catch (error) {
+                    console.error(error);
+                    next(error);
+                }
             }
         }
     }
