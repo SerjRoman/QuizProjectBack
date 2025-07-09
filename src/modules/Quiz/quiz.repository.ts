@@ -24,11 +24,13 @@ export const QuizRepository: IQuizRepository = {
             throw error;
         }
     },
-    getAll: async function (include, omit) {
+    getAll: async function (include, omit, limit, offset) {
         try {
             return await client.quiz.findMany({
                 include,
                 omit,
+                skip: offset,
+                take: limit,
             });
         } catch (error) {
             if (error instanceof PrismaKnownError) {

@@ -2,10 +2,12 @@ import { QuizRepository } from './quiz.repository';
 import type { IQuizService } from './quiz.types';
 
 export const QuizService: IQuizService = {
-    getAll: async (include, omit) => {
+    getAll: async (include, omit, limit, offset) => {
         return await QuizRepository.getAll<typeof include, typeof omit>(
             include,
             omit,
+            limit,
+            offset,
         );
     },
     getById: async function (id, include, omit) {

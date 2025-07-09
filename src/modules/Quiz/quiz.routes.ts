@@ -6,7 +6,7 @@ import { authenticateMiddleware } from '@src/middlewares/authenticate';
 
 const router = Router();
 
-router.use(authenticateMiddleware);
+// router.use(authenticateMiddleware);
 
 router.get('/', validateMiddleware(QuizSchema.getAll), QuizController.getAll);
 router.get(
