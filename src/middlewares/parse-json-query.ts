@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
 export const parseJsonQueryMiddleware = (
-    req: Request,
+    req: Request<unknown, object, object, Record<string, unknown>>,
     res: Response,
     next: NextFunction,
 ) => {
@@ -10,9 +10,7 @@ export const parseJsonQueryMiddleware = (
 
         if (typeof value === 'string') {
             if (!isNaN(Number(value))) {
-                // req.query[key] = Number(value);
-                req.query[key] = JSON.parse(value);
-                // req.query.limit = value;
+                req.query[key] = Number(value);
             }
 
             if (value.startsWith('[') || value.startsWith('{')) {
