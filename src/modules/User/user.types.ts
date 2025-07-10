@@ -1,4 +1,4 @@
-import { Prisma, User as PrismaUser } from '#prisma/prisma/';
+import { $Enums, Prisma, User as PrismaUser } from '#prisma/prisma/';
 import { Request, Response, NextFunction } from 'express';
 import { InferType } from 'yup';
 import { UserSchema } from './user.schema';
@@ -11,6 +11,7 @@ export type UserWithArgs<
     O extends UserOmit = object,
 > = Prisma.UserGetPayload<{ include: I; omit: O }>;
 
+export type UserRolesEnum = $Enums.Role
 export type UserCreateInput = Prisma.UserUncheckedCreateInput;
 export type UserUpdateInput = Prisma.UserUncheckedUpdateInput;
 export type UserInclude = Prisma.UserInclude;

@@ -1,0 +1,9 @@
+model Language {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String
+  slug String
+
+  quiz    Quiz[]   @relation(fields: [quizIds], references: [id], name: "QuizLanguageRelation")
+  quizIds String[] @db.ObjectId
+}

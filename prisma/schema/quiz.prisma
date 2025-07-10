@@ -1,11 +1,45 @@
-model Quiz {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  questions Question[]
-  createdAt DateTime   @default(now())
+enum QuizStatus {
+  PUBLISHED
+  DRAFT
+}
 
-  TeacherCreated   TeacherProfile? @relation(fields: [TeacherCreatedId], references: [id])
-  TeacherCreatedId String?         @db.ObjectId
-  StudentAttempted   StudentProfile? @relation(fields: [StudentAttemptedId], references: [id])
-  StudentAttemptedId String?         @db.ObjectId
+model Quiz {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  isPrivate  Boolean    @default(false)
+  status     QuizStatus @default(DRAFT)
+  coverImage String?
+
+  tags    Tag[]    @relation(fields: [tagsIds], references: [id], name: "QuizTagRelation")
+  tagsIds String[] @db.ObjectId
+
+  language    Language[] @relation(fields: [languageIds], references: [id], name: "QuizLanguageRelation")
+  languageIds String[]   @db.ObjectId
+
+  shuffleAnswers   Boolean @default(false)
+  shuffleQuestions Boolean @default(false)
+
+  subject   Subject @relation(fields: [subjectId], references: [id], name: "QuizSubjectRelation")
+  subjectId String  @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User    User[]   @relation(fields: [userIDs], references: [id], name: "FaviroteQuizzesRelation")
+  userIDs String[] @db.ObjectId
+
+  createdBy   TeacherProfile @relation(fields: [createdById], references: [id], name: "CreatedQuizzesRelation")
+  createdById String         @db.ObjectId
+
+  copiedBy    TeacherProfile[] @relation(fields: [copiedByIds], references: [id], name: "CopiedQuizzesRelation")
+  copiedByIds String[]         @db.ObjectId
+
+  completedBy    StudentProfile[] @relation(fields: [completedByIds], references: [id], name: "CompletedByRelation")
+  completedByIds String[]         @db.ObjectId
+
+  folders   QuizFolder[] @relation(fields: [folderIds], references: [id], name: "QuizFolderQuizzesRelation")
+  folderIds String[]     @db.ObjectId
+  questions Question[]
+
+  attempted QuizAttempt[] @relation(name: "QuizParticipantAttemptQuizRelation")
 }

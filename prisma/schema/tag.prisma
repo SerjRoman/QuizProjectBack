@@ -1,0 +1,9 @@
+model Tag {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String
+  slug String
+
+  quizzes    Quiz[]   @relation(fields: [quizzesIds], references: [id], name: "QuizTagRelation")
+  quizzesIds String[] @db.ObjectId
+}

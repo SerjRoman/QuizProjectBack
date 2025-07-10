@@ -18,6 +18,13 @@ export const QuizSchema = {
         .object({
             body: yup.object({
                 title: yup.string().required('Title is required'),
+                subjectId: yup.string().required('Subject ID is required'),
+                coverImage: yup.string().optional(),
+                tagsIds: yup.array().of(yup.string().required()).optional(),
+                languageIds: yup.array().of(yup.string().required()).optional(),
+                shuffleAnswers: yup.boolean().default(false),
+                shuffleQuestions: yup.boolean().default(false),
+
             }),
         })
         .required(),

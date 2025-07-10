@@ -1,5 +1,5 @@
 import { QuizService } from './quiz.service';
-import type { IQuizController, QuizInclude, QuizOmit } from './quiz.types';
+import type { IQuizController, QuizCreateInput, QuizInclude, QuizOmit } from './quiz.types';
 
 export const QuizController: IQuizController = {
     getAll: async function (req, res, next) {
@@ -59,7 +59,8 @@ export const QuizController: IQuizController = {
     },
     create: async function (req, res, next) {
         try {
-            res.status(201).json(await QuizService.create(req.body));
+            const data: QuizCreateInput = {...req.body, createdById: res.locals.userId};
+            res.status(201).json(await QuizService.create(data));
         } catch (error) {
             next(error);
         }

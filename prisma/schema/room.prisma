@@ -1,0 +1,18 @@
+enum RoomStatus {
+  ACTIVE
+  FINISHED
+  WAITING
+}
+
+model Room {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name         String
+  status       RoomStatus
+  participants QuizParticipant[] @relation(name: "QuizParticipantRoomRelation")
+
+  reports Report[] @relation(name: "RoomReportRelation")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

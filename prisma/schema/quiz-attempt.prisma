@@ -1,0 +1,15 @@
+model QuizAttempt {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  quizId String @db.ObjectId
+  quiz   Quiz   @relation(fields: [quizId], references: [id], name: "QuizParticipantAttemptQuizRelation")
+
+  participantId String          @unique @db.ObjectId
+  participant   QuizParticipant @relation(name: "QuizParticipantAttemptParticipantRelation", fields: [participantId], references: [id])
+  score         Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  answers QuizAttemptAnswer[] @relation(name: "QuizAttemptAnswerAttemptRelation")
+}

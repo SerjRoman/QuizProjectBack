@@ -1,0 +1,19 @@
+enum ParticipantType {
+  STUDENT
+  GUEST
+}
+
+model QuizParticipant {
+  id     String          @id @default(auto()) @map("_id") @db.ObjectId
+  name   String
+  avatar String
+  type   ParticipantType
+
+  studentProfileId String?         @db.ObjectId
+  studentProfile   StudentProfile? @relation(fields: [studentProfileId], references: [id], name: "QuizParticipantStudentProfileRelation")
+
+  roomId String @db.ObjectId
+  room   Room   @relation(fields: [roomId], references: [id], name: "QuizParticipantRoomRelation")
+
+  attempts QuizAttempt[] @relation(name: "QuizParticipantAttemptParticipantRelation")
+}

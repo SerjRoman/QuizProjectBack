@@ -1,0 +1,15 @@
+model QuizAttemptAnswer {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  questionId String   @db.ObjectId
+  question   Question @relation(fields: [questionId], references: [id], name: "QuizAttemptAnswerQuestionRelation")
+
+  attemptId String      @db.ObjectId
+  attempt   QuizAttempt @relation(fields: [attemptId], references: [id], name: "QuizAttemptAnswerAttemptRelation")
+
+  answer    Json
+  isCorrect Boolean
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

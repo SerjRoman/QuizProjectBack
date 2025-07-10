@@ -8,7 +8,7 @@ export type Quiz = QuizPrisma;
 
 export type QuizUpdateInput = Prisma.QuizUpdateInput;
 
-export type QuizCreateInput = Prisma.QuizCreateInput;
+export type QuizCreateInput = Prisma.QuizUncheckedCreateInput;
 
 export type QuizInclude = Prisma.QuizInclude;
 export type QuizOmit = Prisma.QuizOmit;

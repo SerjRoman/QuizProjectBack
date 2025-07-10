@@ -1,0 +1,12 @@
+model Report {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  classroomId String    @db.ObjectId
+  classroom   Classroom @relation(fields: [classroomId], references: [id], name: "ReportClassroomRelation")
+
+  roomId String @db.ObjectId
+  room   Room   @relation(fields: [roomId], references: [id], name: "RoomReportRelation")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

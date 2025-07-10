@@ -1,5 +1,7 @@
 import * as yup from 'yup';
 
+
+
 const commonQueries = yup.object({
     include: yup
         .array()
@@ -29,7 +31,7 @@ export const UserSchema = {
             email: yup.string().email().required(),
             username: yup.string().min(3).max(20).required(),
             password: yup.string().min(6).max(50).required(),
-            role: yup.string().oneOf(['Student', 'Teacher']).required(),
+            role: yup.string().oneOf(['TEACHER', 'STUDENT']).required(),
         }),
     }),
     update: yup.object({
@@ -40,7 +42,7 @@ export const UserSchema = {
             email: yup.string().email().optional(),
             username: yup.string().min(3).max(20).optional(),
             password: yup.string().min(6).max(50).optional(),
-            role: yup.string().oneOf(['Student', 'Teacher']).optional(),
+            role: yup.string().oneOf(['STUDENT', 'TEACHER']).optional(),
         }),
     }),
     delete: yup.object({
