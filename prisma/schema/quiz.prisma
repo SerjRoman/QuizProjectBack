@@ -42,4 +42,6 @@ model Quiz {
   questions Question[]
 
   attempted QuizAttempt[] @relation(name: "QuizParticipantAttemptQuizRelation")
+
+  rooms Room[] @relation(name: "QuizRoomRelation")
 }
