@@ -10,6 +10,8 @@ model Room {
   name         String
   status       RoomStatus
   participants QuizParticipant[] @relation(name: "QuizParticipantRoomRelation")
+  quizId String @db.ObjectId
+  quiz Quiz @relation(fields: [quizId], references: [id], name: "QuizRoomRelation")
 
   reports Report[] @relation(name: "RoomReportRelation")
 
