@@ -13,8 +13,8 @@ model Quiz {
   tags    Tag[]    @relation(fields: [tagsIds], references: [id], name: "QuizTagRelation")
   tagsIds String[] @db.ObjectId
 
-  language    Language[] @relation(fields: [languageIds], references: [id], name: "QuizLanguageRelation")
-  languageIds String[]   @db.ObjectId
+  languages    Language[] @relation(fields: [languagesIds], references: [id], name: "QuizLanguageRelation")
+  languagesIds String[]   @db.ObjectId
 
   shuffleAnswers   Boolean @default(false)
   shuffleQuestions Boolean @default(false)
@@ -25,8 +25,8 @@ model Quiz {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  User    User[]   @relation(fields: [userIDs], references: [id], name: "FaviroteQuizzesRelation")
-  userIDs String[] @db.ObjectId
+  favouritedBy    User[]   @relation(fields: [favouritedByIds], references: [id], name: "FavouriteQuizzesRelation")
+  favouritedByIds String[] @db.ObjectId
 
   createdBy   TeacherProfile @relation(fields: [createdById], references: [id], name: "CreatedQuizzesRelation")
   createdById String         @db.ObjectId

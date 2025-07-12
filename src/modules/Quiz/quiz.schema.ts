@@ -1,18 +1,35 @@
 import * as yup from 'yup';
+import {
+    QuizIncludeArray,
+    QuizOmitArray,
+    QuizSelectArray,
+    QuizStatusArray,
+} from './quiz.constants';
 
 const commonQuizQuerySchema = yup.object({
     include: yup
         .array()
-        .of(yup.string().oneOf(['questions']).required())
+        .of(yup.string().oneOf(QuizIncludeArray).required())
         .optional(),
     omit: yup
         .array()
-        .of(yup.string().oneOf(['id', 'title', 'createdAt']).required())
+        .of(yup.string().oneOf(QuizOmitArray).required())
+        .optional(),
+    select: yup
+        .array()
+        .of(yup.string().oneOf(QuizSelectArray).required())
         .optional(),
     limit: yup.number().optional(),
     offset: yup.number().optional(),
 });
 
+const getAllFilters = yup.object({
+    tags: yup.array().of(yup.string().required()).optional(),
+    languages: yup.array().of(yup.string().required()).optional(),
+    subject: yup.string().optional(),
+    isPrivate: yup.boolean().optional(),
+    status: yup.string().oneOf(QuizStatusArray).optional(),
+});
 export const QuizSchema = {
     create: yup
         .object({
@@ -24,12 +41,13 @@ export const QuizSchema = {
                 languageIds: yup.array().of(yup.string().required()).optional(),
                 shuffleAnswers: yup.boolean().default(false),
                 shuffleQuestions: yup.boolean().default(false),
-
             }),
         })
         .required(),
     getAll: yup.object({
-        query: commonQuizQuerySchema.optional(),
+        query: getAllFilters
+            .optional()
+            .concat(commonQuizQuerySchema.optional()),
     }),
     getById: yup.object({
         query: commonQuizQuerySchema.optional(),

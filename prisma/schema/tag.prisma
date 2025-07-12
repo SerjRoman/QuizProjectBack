@@ -1,8 +1,8 @@
 model Tag {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  name String
-  slug String
+  name String @unique
+  slug String @unique
 
   quizzes    Quiz[]   @relation(fields: [quizzesIds], references: [id], name: "QuizTagRelation")
   quizzesIds String[] @db.ObjectId
