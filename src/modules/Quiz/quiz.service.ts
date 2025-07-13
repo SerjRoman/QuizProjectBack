@@ -24,18 +24,18 @@ export const QuizService: IQuizService = {
             where,
         );
     },
-    getAllWithSelect: async function (select, limit, offset, filters) {
-        const where: QuizWhere = {};
+    getAllWithSelect: async function (select, limit, offset, filters, where) {
+        const prismaWhere: QuizWhere = { ...where };
         if (filters) {
             const { tags, languages, subject } = filters;
             if (tags) {
-                where.tags = { some: { name: { in: tags } } };
+                prismaWhere.tags = { some: { name: { in: tags } } };
             }
             if (languages) {
-                where.languages = { some: { name: { in: languages } } };
+                prismaWhere.languages = { some: { name: { in: languages } } };
             }
             if (subject) {
-                where.subject = { name: subject };
+                prismaWhere.subject = { name: subject };
             }
         }
         return await QuizRepository.getAllWithSelect<typeof select>(

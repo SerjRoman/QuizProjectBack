@@ -38,6 +38,14 @@ export const QuizSelectArray: KeysArray<QuizSelect> = [
     'copiedByIds',
     'completedByIds',
     'folderIds',
+    'subject',
+    'languages',
+    'completedBy',
+    'copiedBy',
+    'createdBy',
+    'favouritedBy',
+    'folders',
+    'questions',
 ];
 
 export const QuizIncludeArray: KeysArray<QuizInclude> = [

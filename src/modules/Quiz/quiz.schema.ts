@@ -30,6 +30,7 @@ const getAllFilters = yup.object({
     isPrivate: yup.boolean().optional(),
     status: yup.string().oneOf(QuizStatusArray).optional(),
 });
+
 export const QuizSchema = {
     create: yup
         .object({
@@ -56,5 +57,25 @@ export const QuizSchema = {
         params: yup.object({
             id: yup.string().required(),
         }),
+    }),
+    teacherMy: yup.object({
+        query: getAllFilters
+            .optional()
+            .concat(commonQuizQuerySchema.optional()),
+    }),
+    teacherMyCopied: yup.object({
+        query: getAllFilters
+            .optional()
+            .concat(commonQuizQuerySchema.optional()),
+    }),
+    teacherMyCreated: yup.object({
+        query: getAllFilters
+            .optional()
+            .concat(commonQuizQuerySchema.optional()),
+    }),
+    teacherMyFavourite: yup.object({
+        query: getAllFilters
+            .optional()
+            .concat(commonQuizQuerySchema.optional()),
     }),
 };

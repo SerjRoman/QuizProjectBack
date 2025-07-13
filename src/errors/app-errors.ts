@@ -35,6 +35,11 @@ export class AuthenticationError extends AppError {
         super(`Authentication error: ${message}`, 401, errorCode);
     }
 }
+export class ForbiddenError extends AppError {
+    constructor(message: string, errorCode?: string) {
+        super(`Forbidden error: ${message}`, 403, errorCode);
+    }
+}
 export enum PrismaErrors {
     NOT_FOUND = 'P2025',
     CONFLICT = 'P2002',

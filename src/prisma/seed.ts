@@ -15,46 +15,17 @@ async function seed() {
         // });
         const user = await client.teacherProfile.update({
             where: {
-                userId: '6872a04f13457305e1bbfc16',
+                userId: '6873d3d88641dc3e69f11939',
             },
             data: {
                 createdQuizzes: {
                     create: {
-                        title: 'Quiz 2',
-                        subject: {
-                            create: {
-                                name: 'English',
-                                slug: 'english',
-                            },
-                        },
-                        tags: {
-                            create: {
-                                name: 'For adults',
-                                slug: 'for-adults',
-                            },
-                        },
-                        languages: {
-                            connectOrCreate: [
-                                {
-                                    where: {
-                                        name: 'English',
-                                    },
-                                    create: {
-                                        name: 'English',
-                                        slug: 'english',
-                                    },
-                                },
-                                {
-                                    create: {
-                                        name: 'Spanish',
-                                        slug: 'spanish',
-                                    },
-                                    where: {
-                                        name: 'Spanish',
-                                    },
-                                },
-                            ],
-                        },
+                        title: 'Quiz 3',
+                        subjectId: '6872a04f13457305e1bbfc18',
+                        tagsIds: [
+                            '6872b492759dde443f58194d',
+                            '6872b74244243c35c544c498',
+                        ],
                     },
                 },
             },
@@ -69,4 +40,3 @@ async function seed() {
 }
 
 seed();
-

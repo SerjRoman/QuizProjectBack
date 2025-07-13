@@ -1,5 +1,6 @@
-import { AuthenticationError } from '@src/errors';
+import { AuthenticationError, ForbiddenError } from '@src/errors';
 import { UserService } from '@src/modules/User';
+import { AuthRequest, AuthResponse } from '@src/types';
 import { NextFunction, Request, Response } from 'express';
 
 export const authenticateMiddleware = (
@@ -34,3 +35,24 @@ export const authenticateMiddleware = (
         next(error);
     }
 };
+export async function isTeacherMiddleware(
+    req: AuthRequest,
+    res: AuthResponse,
+    next: NextFunction,
+) {
+    try {
+        const user = await UserService.getById(res.locals.userId, {}, {});
+        if (user.role === 'TEACHER') {
+            next();
+        } else {
+            next(
+                new ForbiddenError(
+                    'You must be a teacher to have access to this endpoint',
+                    'not_teacher',
+                ),
+            );
+        }
+    } catch (error) {
+        next(error);
+    }
+}

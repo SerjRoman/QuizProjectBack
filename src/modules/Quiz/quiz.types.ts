@@ -48,6 +48,46 @@ export interface IQuizController {
         res: AuthResponse<QuizWithArgs[] | QuizWithSelect[]>,
         next: NextFunction,
     ) => void;
+    teacherMy: (
+        req: AuthRequest<
+            object,
+            object,
+            object,
+            InferType<typeof QuizSchema.getAll>['query']
+        >,
+        res: AuthResponse<QuizWithArgs[] | QuizWithSelect[]>,
+        next: NextFunction,
+    ) => void;
+    teacherMyCopied: (
+        req: AuthRequest<
+            object,
+            object,
+            object,
+            InferType<typeof QuizSchema.getAll>['query']
+        >,
+        res: AuthResponse<QuizWithSelect[]>,
+        next: NextFunction,
+    ) => void;
+    teacherMyFavourite: (
+        req: AuthRequest<
+            object,
+            object,
+            object,
+            InferType<typeof QuizSchema.getAll>['query']
+        >,
+        res: AuthResponse<QuizWithSelect[]>,
+        next: NextFunction,
+    ) => void;
+    teacherMyCreated: (
+        req: AuthRequest<
+            object,
+            object,
+            object,
+            InferType<typeof QuizSchema.getAll>['query']
+        >,
+        res: AuthResponse<QuizWithSelect[]>,
+        next: NextFunction,
+    ) => void;
     getById: (
         req: AuthRequest<
             { id: string },
@@ -94,6 +134,7 @@ export interface IQuizService {
             languages?: string[] | undefined;
             subject?: string | undefined;
         },
+        where?: QuizWhere
     ) => Promise<QuizWithSelect[]>;
     getById: (
         id: string,
