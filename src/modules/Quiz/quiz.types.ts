@@ -55,7 +55,7 @@ export interface IQuizController {
             object,
             InferType<typeof QuizSchema.getAll>['query']
         >,
-        res: AuthResponse<QuizWithArgs[] | QuizWithSelect[]>,
+        res: AuthResponse<QuizWithSelect[] | Quiz[]>,
         next: NextFunction,
     ) => void;
     teacherMyCopied: (
@@ -65,7 +65,7 @@ export interface IQuizController {
             object,
             InferType<typeof QuizSchema.getAll>['query']
         >,
-        res: AuthResponse<QuizWithSelect[]>,
+        res: AuthResponse<QuizWithSelect[] | Quiz[]>,
         next: NextFunction,
     ) => void;
     teacherMyFavourite: (
@@ -75,7 +75,7 @@ export interface IQuizController {
             object,
             InferType<typeof QuizSchema.getAll>['query']
         >,
-        res: AuthResponse<QuizWithSelect[]>,
+        res: AuthResponse<QuizWithSelect[] | Quiz[]>,
         next: NextFunction,
     ) => void;
     teacherMyCreated: (
@@ -85,7 +85,7 @@ export interface IQuizController {
             object,
             InferType<typeof QuizSchema.getAll>['query']
         >,
-        res: AuthResponse<QuizWithSelect[]>,
+        res: AuthResponse<QuizWithSelect[] | Quiz[]>,
         next: NextFunction,
     ) => void;
     getById: (
@@ -95,7 +95,7 @@ export interface IQuizController {
             object,
             InferType<typeof QuizSchema.getById>['query']
         >,
-        res: AuthResponse<QuizWithSelect>,
+        res: AuthResponse<QuizWithSelect | Quiz>,
         next: NextFunction,
     ) => void;
     delete: (
@@ -111,6 +111,17 @@ export interface IQuizController {
         >,
         res: AuthResponse<QuizCreateInput>,
         next: NextFunction,
+    ) => void;
+    handleTeacherQuizRequest: (
+        req: AuthRequest<
+            object,
+            object,
+            object,
+            InferType<typeof QuizSchema.getAll>['query']
+        >,
+        res: AuthResponse<QuizWithSelect[] | Quiz[]>,
+        next: NextFunction,
+        prismaWhereClause: QuizWhere,
     ) => void;
 }
 export interface IQuizService {

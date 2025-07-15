@@ -1,3 +1,4 @@
+import { isObjectEmpty } from '@utils';
 import { QuizRepository } from './quiz.repository';
 import type { IQuizService, QuizWhere } from './quiz.types';
 
@@ -39,14 +40,17 @@ export const QuizService: IQuizService = {
             }
         }
         return await QuizRepository.getAllWithSelect<typeof select>(
-            select,
+            !isObjectEmpty(select) ? select : undefined,
             limit,
             offset,
-            where,
+            prismaWhere,
         );
     },
     getById: async function (id, select) {
-        return await QuizRepository.getById<typeof select>(id, select);
+        return await QuizRepository.getById<typeof select>(
+            id,
+            !isObjectEmpty(select) ? select : undefined,
+        );
     },
     create: async function (data) {
         return await QuizRepository.create(data);

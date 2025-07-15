@@ -9,6 +9,38 @@ import type {
 } from './quiz.types';
 
 export const QuizController: IQuizController = {
+    handleTeacherQuizRequest: async function (
+        req,
+        res,
+        next,
+        prismaWhereClause,
+    ) {
+        try {
+            const { query } = req;
+
+            const select = arrayToBooleanObject(query?.select);
+            const limit = query?.limit ? Number(query.limit) : undefined;
+            const offset = query?.offset ? Number(query.offset) : undefined;
+
+            const commonFilters = {
+                tags: query?.tags,
+                languages: query?.languages,
+                subject: query?.subject,
+            };
+
+            const quizzes = await QuizService.getAllWithSelect(
+                select,
+                limit,
+                offset,
+                commonFilters,
+                prismaWhereClause,
+            );
+
+            res.status(200).json(quizzes);
+        } catch (error) {
+            next(error);
+        }
+    },
     getAll: async function (req, res, next) {
         try {
             const query = req.query;
@@ -71,114 +103,34 @@ export const QuizController: IQuizController = {
         }
     },
     teacherMy: async function (req, res, next) {
-        try {
-            const query = req.query;
-
-            const select: QuizSelect = arrayToBooleanObject(req.query?.select);
-            const limit: number | undefined = query?.limit;
-            const offset: number | undefined = query?.offset;
-            const filters = {
-                tags: req.query?.tags,
-                languages: req.query?.languages,
-                subject: req.query?.subject,
-            };
-            res.status(200).json(
-                await QuizService.getAllWithSelect(
-                    select,
-                    limit,
-                    offset,
-                    filters,
-                    {
-                        OR: [
-                            {
-                                copiedBy: {
-                                    some: {
-                                        userId: res.locals.userId,
-                                    },
-                                },
-                            },
-                            { createdBy: { userId: res.locals.userId } },
-                        ],
+        const whereClause = {
+            OR: [
+                {
+                    copiedBy: {
+                        some: {
+                            userId: res.locals.userId,
+                        },
                     },
-                ),
-            );
-        } catch (error) {
-            next(error);
-        }
+                },
+                { createdBy: { userId: res.locals.userId } },
+            ],
+        };
+        QuizController.handleTeacherQuizRequest(req, res, next, whereClause);
     },
     teacherMyCopied: async function (req, res, next) {
-        try {
-            const query = req.query;
-
-            const select: QuizSelect = arrayToBooleanObject(req.query?.select);
-            const limit: number | undefined = query?.limit;
-            const offset: number | undefined = query?.offset;
-            const filters = {
-                tags: req.query?.tags,
-                languages: req.query?.languages,
-                subject: req.query?.subject,
-            };
-            res.status(200).json(
-                await QuizService.getAllWithSelect(
-                    select,
-                    limit,
-                    offset,
-                    filters,
-                    { copiedBy: { some: { userId: res.locals.userId } } },
-                ),
-            );
-        } catch (error) {
-            next(error);
-        }
+        const whereClause = {
+            copiedBy: { some: { userId: res.locals.userId } },
+        };
+        QuizController.handleTeacherQuizRequest(req, res, next, whereClause);
     },
     teacherMyCreated: async function (req, res, next) {
-        try {
-            const query = req.query;
-
-            const select: QuizSelect = arrayToBooleanObject(req.query?.select);
-            const limit: number | undefined = query?.limit;
-            const offset: number | undefined = query?.offset;
-            const filters = {
-                tags: req.query?.tags,
-                languages: req.query?.languages,
-                subject: req.query?.subject,
-            };
-            res.status(200).json(
-                await QuizService.getAllWithSelect(
-                    select,
-                    limit,
-                    offset,
-                    filters,
-                    { createdBy: { userId: res.locals.userId } },
-                ),
-            );
-        } catch (error) {
-            next(error);
-        }
+        const whereClause = { createdBy: { userId: res.locals.userId } };
+        QuizController.handleTeacherQuizRequest(req, res, next, whereClause);
     },
     teacherMyFavourite: async function (req, res, next) {
-        try {
-            const query = req.query;
-
-            const select: QuizSelect = arrayToBooleanObject(req.query?.select);
-            const limit: number | undefined = query?.limit;
-            const offset: number | undefined = query?.offset;
-            const filters = {
-                tags: req.query?.tags,
-                languages: req.query?.languages,
-                subject: req.query?.subject,
-            };
-            res.status(200).json(
-                await QuizService.getAllWithSelect(
-                    select,
-                    limit,
-                    offset,
-                    filters,
-                    { favouritedBy: { some: { id: res.locals.userId } } },
-                ),
-            );
-        } catch (error) {
-            next(error);
-        }
+        const whereClause = {
+            favouritedBy: { some: { id: res.locals.userId } },
+        };
+        QuizController.handleTeacherQuizRequest(req, res, next, whereClause);
     },
 };
