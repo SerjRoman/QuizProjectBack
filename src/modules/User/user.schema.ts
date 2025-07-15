@@ -1,27 +1,10 @@
 import * as yup from 'yup';
-
-
+import { USER_SELECT } from './user.constants';
 
 const commonQueries = yup.object({
-    include: yup
+    select: yup
         .array()
-        .of(yup.string().oneOf(['teacherProfile', 'studentProfile']).required())
-        .optional(),
-    omit: yup
-        .array()
-        .of(
-            yup
-                .string()
-                .oneOf([
-                    'id',
-                    'createdAt',
-                    'username',
-                    'email',
-                    'role',
-                    'password',
-                ])
-                .required(),
-        )
+        .of(yup.string().oneOf(USER_SELECT).required())
         .optional(),
 });
 

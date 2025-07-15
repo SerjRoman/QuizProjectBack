@@ -1,16 +1,15 @@
 import { Router } from 'express';
 import { QuizController } from './quiz.controller';
-import { validateMiddleware } from '@src/middlewares/validate';
 import { QuizSchema } from './quiz.schema';
 import {
     authenticateMiddleware,
     isTeacherMiddleware,
-} from '@src/middlewares/authenticate';
-// import { authenticateMiddleware } from '@src/middlewares/authenticate';
+    validateMiddleware,
+} from '@middlewares';
 
 const router = Router();
 
-// router.use(authenticateMiddleware);
+router.use(authenticateMiddleware);
 
 router.get('/', validateMiddleware(QuizSchema.getAll), QuizController.getAll);
 router.get(

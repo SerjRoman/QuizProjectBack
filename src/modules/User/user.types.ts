@@ -2,7 +2,7 @@ import { $Enums, Prisma, User as PrismaUser } from '#prisma/prisma/';
 import { Request, Response, NextFunction } from 'express';
 import { InferType } from 'yup';
 import { UserSchema } from './user.schema';
-import { AuthRequest, AuthResponse } from '@src/types/express';
+import { AuthRequest, AuthResponse } from '#types';
 
 export type User = PrismaUser;
 
@@ -11,12 +11,16 @@ export type UserWithArgs<
     O extends UserOmit = object,
 > = Prisma.UserGetPayload<{ include: I; omit: O }>;
 
-export type UserRolesEnum = $Enums.Role
+export type UserRolesEnum = $Enums.Role;
 export type UserCreateInput = Prisma.UserUncheckedCreateInput;
 export type UserUpdateInput = Prisma.UserUncheckedUpdateInput;
 export type UserInclude = Prisma.UserInclude;
 export type UserOmit = Prisma.UserOmit;
 export type UserLoginPayload = Pick<User, 'email' | 'password'>;
+
+export type UserSelect = Prisma.UserSelect;
+export type UserWithSelect<S extends UserSelect = object> =
+    Prisma.UserGetPayload<{ select: S }>;
 
 export interface IUserController {
     create: (
@@ -36,7 +40,7 @@ export interface IUserController {
             object,
             InferType<typeof UserSchema.getById>['query']
         >,
-        res: Response<UserWithArgs | null>,
+        res: Response<User | UserWithSelect | null>,
         next: NextFunction,
     ) => void;
     update: (
@@ -61,7 +65,7 @@ export interface IUserController {
             object,
             InferType<typeof UserSchema.getById>['query']
         >,
-        res: AuthResponse<UserWithArgs | null>,
+        res: AuthResponse<UserWithSelect | Omit<User, 'password'> | null>,
         next: NextFunction,
     ) => void;
     refresh: (
@@ -105,11 +109,10 @@ export interface IUserService {
     login: (
         data: UserLoginPayload,
     ) => Promise<{ token: string; refreshToken: string }>;
-    getById: (
+    getById: <S extends UserSelect>(
         id: string,
-        include: UserInclude,
-        omit: UserOmit,
-    ) => Promise<User>;
+        select: UserSelect,
+    ) => Promise<Omit<User, 'password'> | UserWithSelect<S>>;
     update: (id: string, data: UserUpdateInput) => Promise<User>;
     delete: (id: string) => Promise<User>;
     hashPassword: (password: string) => Promise<string>;
@@ -126,11 +129,10 @@ export interface IUserService {
 
 export interface IUserRepository {
     create: (data: UserCreateInput) => Promise<User>;
-    getById: <I extends UserInclude, O extends UserOmit>(
+    getById: <S extends UserSelect>(
         id: string,
-        include: I,
-        omit: O,
-    ) => Promise<UserWithArgs<I, O>>;
+        select?: S,
+    ) => Promise<User | UserWithSelect<S>>;
     update: (id: string, data: UserUpdateInput) => Promise<User>;
     delete: (id: string) => Promise<User>;
     getByEmail: <I extends UserInclude = object, O extends UserOmit = object>(

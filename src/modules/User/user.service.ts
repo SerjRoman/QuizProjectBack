@@ -2,9 +2,9 @@ import { compare, hash } from 'bcryptjs';
 import { UserRepository } from './user.repository';
 import { IUserService } from './user.types';
 import { sign, TokenExpiredError, verify } from 'jsonwebtoken';
-import { env } from '@src/config';
 import { StringValue } from 'ms';
-import { AuthenticationError, ConflictError, NotFoundError } from '@src/errors';
+import { AuthenticationError, ConflictError, NotFoundError } from '@errors';
+import { env } from '@config';
 
 export const UserService: IUserService = {
     repo: UserRepository,
@@ -51,8 +51,8 @@ export const UserService: IUserService = {
         return await this.repo.create(data);
     },
 
-    getById: async function (id, include = {}, omit = {}) {
-        return await this.repo.getById(id, include, omit);
+    getById: async function (id, select) {
+        return await this.repo.getById<typeof select>(id, select);
     },
     update: async function (id, data) {
         return await this.repo.update(id, data);

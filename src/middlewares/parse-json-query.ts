@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 export const parseJsonQueryMiddleware = (
     req: Request<unknown, object, object, Record<string, unknown>>,
-    res: Response,
+    _: Response,
     next: NextFunction,
 ) => {
     for (const key in req.query) {

@@ -1,4 +1,4 @@
-import { arrayToBooleanObject } from '@src/utils/array-to-boolean-object';
+import { arrayToBooleanObject } from '@utils';
 import { QuizService } from './quiz.service';
 import type {
     IQuizController,
@@ -10,7 +10,6 @@ import type {
 
 export const QuizController: IQuizController = {
     getAll: async function (req, res, next) {
-        console.log(req.query);
         try {
             const query = req.query;
 
@@ -46,23 +45,9 @@ export const QuizController: IQuizController = {
     },
     getById: async function (req, res, next) {
         try {
-            const include: QuizInclude = {};
-            const omit: QuizOmit = {};
             const id = req.params.id;
-            const query = req.query;
-            if (query) {
-                if (query.include) {
-                    query.include.forEach((q) => {
-                        include[q] = true;
-                    });
-                }
-                if (query.omit) {
-                    query.omit.forEach((q) => {
-                        omit[q] = true;
-                    });
-                }
-            }
-            res.status(200).json(await QuizService.getById(id, include, omit));
+            const select = arrayToBooleanObject(req.query?.select);
+            res.status(200).json(await QuizService.getById(id, select));
         } catch (e) {
             next(e);
         }

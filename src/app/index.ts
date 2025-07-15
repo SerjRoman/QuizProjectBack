@@ -2,8 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import { json } from 'body-parser';
 import { AppRouter } from './routes';
-import { parseJsonQueryMiddleware } from '@src/middlewares/parse-json-query';
-import { errorHandler } from '@src/middlewares/error-handler';
+import { parseJsonQueryMiddleware } from '@middlewares';
+import { errorHandlerMiddleware } from '@middlewares';
 
 const app = express();
 
@@ -13,6 +13,6 @@ app.use(parseJsonQueryMiddleware);
 
 app.use(AppRouter);
 
-app.use(errorHandler);
+app.use(errorHandlerMiddleware);
 
 export default app;

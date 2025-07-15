@@ -1,7 +1,7 @@
-import { KeysArray } from '@src/types';
 import { QuizInclude, QuizOmit, QuizSelect, QuizStatus } from './quiz.types';
+import { KeysArray } from '#types';
 
-export const QuizOmitArray: KeysArray<QuizOmit> = [
+export const QUIZ_OMIT: KeysArray<QuizOmit> = [
     'id',
     'title',
     'isPrivate',
@@ -20,7 +20,7 @@ export const QuizOmitArray: KeysArray<QuizOmit> = [
     'completedByIds',
     'folderIds',
 ];
-export const QuizSelectArray: KeysArray<QuizSelect> = [
+export const QUIZ_SELECT: KeysArray<QuizSelect> = [
     'id',
     'title',
     'isPrivate',
@@ -49,7 +49,7 @@ export const QuizSelectArray: KeysArray<QuizSelect> = [
     'tags',
 ];
 
-export const QuizIncludeArray: KeysArray<QuizInclude> = [
+export const QUIZ_INCLUDE: KeysArray<QuizInclude> = [
     '_count',
     'attempted',
     'completedBy',
@@ -63,4 +63,4 @@ export const QuizIncludeArray: KeysArray<QuizInclude> = [
     'subject',
     'tags',
 ];
-export const QuizStatusArray: QuizStatus[] = ['PUBLISHED', 'DRAFT'];
+export const QUIZ_STATUS: QuizStatus[] = ['PUBLISHED', 'DRAFT'];

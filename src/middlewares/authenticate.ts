@@ -1,6 +1,6 @@
-import { AuthenticationError, ForbiddenError } from '@src/errors';
-import { UserService } from '@src/modules/User';
-import { AuthRequest, AuthResponse } from '@src/types';
+import { AuthRequest, AuthResponse } from '#types';
+import { AuthenticationError, ForbiddenError } from '@errors';
+import { UserService } from '@modules/User';
 import { NextFunction, Request, Response } from 'express';
 
 export const authenticateMiddleware = (
@@ -36,12 +36,17 @@ export const authenticateMiddleware = (
     }
 };
 export async function isTeacherMiddleware(
-    req: AuthRequest,
+    _: AuthRequest,
     res: AuthResponse,
     next: NextFunction,
 ) {
     try {
-        const user = await UserService.getById(res.locals.userId, {}, {});
+        const user = await UserService.getById<{ role: true }>(
+            res.locals.userId,
+            {
+                role: true,
+            },
+        );
         if (user.role === 'TEACHER') {
             next();
         } else {
