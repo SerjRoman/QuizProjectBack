@@ -90,6 +90,9 @@ export const QuizRepository: IQuizRepository = {
                 take: limit,
                 where,
                 select,
+                orderBy: {
+                    createdAt: 'desc',
+                },
             });
         } catch (error) {
             if (error instanceof PrismaKnownError) {
@@ -104,4 +107,3 @@ export const QuizRepository: IQuizRepository = {
         }
     },
 };
-

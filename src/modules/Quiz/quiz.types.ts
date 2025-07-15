@@ -134,7 +134,7 @@ export interface IQuizService {
             languages?: string[] | undefined;
             subject?: string | undefined;
         },
-        where?: QuizWhere
+        where?: QuizWhere,
     ) => Promise<QuizWithSelect[]>;
     getById: (
         id: string,

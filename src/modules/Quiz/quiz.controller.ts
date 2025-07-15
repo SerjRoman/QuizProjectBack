@@ -139,7 +139,7 @@ export const QuizController: IQuizController = {
                     limit,
                     offset,
                     filters,
-                    { copiedBy: { every: { userId: res.locals.userId } } },
+                    { copiedBy: { some: { userId: res.locals.userId } } },
                 ),
             );
         } catch (error) {
@@ -189,7 +189,7 @@ export const QuizController: IQuizController = {
                     limit,
                     offset,
                     filters,
-                    { favouritedBy: { every: { id: res.locals.userId } } },
+                    { favouritedBy: { some: { id: res.locals.userId } } },
                 ),
             );
         } catch (error) {
