@@ -1,30 +1,9 @@
 import { isObjectEmpty } from '@utils';
 import { QuizRepository } from './quiz.repository';
-import type { IQuizService, QuizWhere } from './quiz.types';
+import { IQuizService } from './types/quiz.contract';
+import { QuizWhere } from './types/quiz.domain';
 
 export const QuizService: IQuizService = {
-    getAll: async (include, omit, limit, offset, filters) => {
-        const where: QuizWhere = {};
-        if (filters) {
-            const { tags, languages, subject } = filters;
-            if (tags) {
-                where.tags = { some: { name: { in: tags } } };
-            }
-            if (languages) {
-                where.languages = { some: { name: { in: languages } } };
-            }
-            if (subject) {
-                where.subject = { name: subject };
-            }
-        }
-        return await QuizRepository.getAll<typeof include, typeof omit>(
-            include,
-            omit,
-            limit,
-            offset,
-            where,
-        );
-    },
     getAllWithSelect: async function (select, limit, offset, filters, where) {
         const prismaWhere: QuizWhere = { ...where };
         if (filters) {
@@ -47,8 +26,8 @@ export const QuizService: IQuizService = {
         );
     },
     getById: async function (id, select) {
-        return await QuizRepository.getById<typeof select>(
-            id,
+        return await QuizRepository.get<typeof select>(
+            { id },
             !isObjectEmpty(select) ? select : undefined,
         );
     },
@@ -56,6 +35,30 @@ export const QuizService: IQuizService = {
         return await QuizRepository.create(data);
     },
     delete: async function (id) {
-        return await QuizRepository.delete(id);
+        return await QuizRepository.delete({ id });
+    },
+    updateFavourite: async function (userId, quizId) {
+        return await QuizRepository.update(
+            { id: quizId },
+            {
+                favouritedBy: {
+                    connect: {
+                        id: userId,
+                    },
+                },
+            },
+        );
+    },
+    deleteFavourite: async function (userId, quizId) {
+        return await QuizRepository.update(
+            { id: quizId },
+            {
+                favouritedBy: {
+                    disconnect: {
+                        id: userId,
+                    },
+                },
+            },
+        );
     },
 };

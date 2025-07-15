@@ -1,17 +1,7 @@
 import * as yup from 'yup';
-import {
-    QUIZ_INCLUDE,
-    QUIZ_OMIT,
-    QUIZ_SELECT,
-    QUIZ_STATUS,
-} from './quiz.constants';
+import { QUIZ_SELECT, QUIZ_STATUS } from './constants/quiz.constants';
 
 const commonQuizQuerySchema = yup.object({
-    include: yup
-        .array()
-        .of(yup.string().oneOf(QUIZ_INCLUDE).required())
-        .optional(),
-    omit: yup.array().of(yup.string().oneOf(QUIZ_OMIT).required()).optional(),
     select: yup
         .array()
         .of(yup.string().oneOf(QUIZ_SELECT).required())
@@ -33,7 +23,10 @@ export const QuizSchema = {
         .object({
             body: yup.object({
                 title: yup.string().required('Title is required'),
-                subjectId: yup.string().required('Subject ID is required'),
+                subjectId: yup
+                    .string()
+                    .length(24)
+                    .required('Subject ID is required'),
                 coverImage: yup.string().optional(),
                 tagsIds: yup.array().of(yup.string().required()).optional(),
                 languageIds: yup.array().of(yup.string().required()).optional(),
@@ -81,5 +74,27 @@ export const QuizSchema = {
         query: getAllFilters
             .optional()
             .concat(commonQuizQuerySchema.optional()),
+    }),
+    updateFavourite: yup.object({
+        params: yup.object({
+            id: yup.string().length(24).required(),
+        }),
+    }),
+    deleteFavourite: yup.object({
+        params: yup.object({
+            id: yup.string().length(24).required(),
+        }),
+    }),
+    patch: yup.object({
+        params: yup.object({
+            id: yup.string().length(24).required(),
+        }),
+        body: yup.object({
+            title: yup.string().optional(),
+            shuffleQuestions: yup.boolean().optional(),
+            status: yup.string().oneOf(QUIZ_STATUS).optional(),
+            isPrivate: yup.boolean().optional(),
+            shuffleAnswers: yup.boolean().optional(),
+        }),
     }),
 };

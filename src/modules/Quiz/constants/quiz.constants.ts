@@ -1,10 +1,15 @@
-import { QuizInclude, QuizOmit, QuizSelect, QuizStatus } from './quiz.types';
+import {
+    QuizInclude,
+    QuizOmit,
+    QuizSelect,
+    QuizStatus,
+} from '../types/quiz.domain';
 import { KeysArray } from '#types';
 
 export const QUIZ_OMIT: KeysArray<QuizOmit> = [
     'id',
     'title',
-    'isPrivate',
+    'visibility',
     'status',
     'coverImage',
     'tagsIds',
@@ -23,7 +28,7 @@ export const QUIZ_OMIT: KeysArray<QuizOmit> = [
 export const QUIZ_SELECT: KeysArray<QuizSelect> = [
     'id',
     'title',
-    'isPrivate',
+    'visibility',
     'status',
     'coverImage',
     'tagsIds',
