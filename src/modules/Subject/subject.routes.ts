@@ -12,4 +12,4 @@ router.get(
     SubjectController.getAll,
 );
 
-export { router as SubjectRouter };
+export { router as SubjectRoutes };
