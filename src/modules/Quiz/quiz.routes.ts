@@ -11,18 +11,13 @@ const router = Router();
 
 router.use(authenticateMiddleware);
 
-router.get('/', validateMiddleware(QuizSchema.getAll), QuizController.getAll);
 router.get(
     '/:id',
     validateMiddleware(QuizSchema.getById),
     QuizController.getById,
 );
 router.post('/', validateMiddleware(QuizSchema.create), QuizController.create);
-router.delete(
-    '/:id',
-    validateMiddleware(QuizSchema.delete),
-    QuizController.delete,
-);
+
 router.get(
     '/teacher/my',
     authenticateMiddleware,
@@ -50,6 +45,24 @@ router.get(
     isTeacherMiddleware,
     validateMiddleware(QuizSchema.teacherMyFavourite),
     QuizController.teacherMyFavourite,
+);
+
+router.put(
+    '/:id/favourite',
+    authenticateMiddleware,
+    validateMiddleware(QuizSchema.updateFavourite),
+    QuizController.addToFavourites
+);
+router.delete(
+    '/:id/favourite',
+    authenticateMiddleware,
+    validateMiddleware(QuizSchema.deleteFavourite),
+    QuizController.removeFromFavourites
+);
+router.delete(
+    '/:id',
+    validateMiddleware(QuizSchema.delete),
+    QuizController.delete,
 );
 
 export { router as QuizRoutes };

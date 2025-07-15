@@ -2,11 +2,15 @@ enum QuizStatus {
   PUBLISHED
   DRAFT
 }
+enum QuizVisibility {
+    PRIVATE
+    PUBLIC
+}
 
 model Quiz {
   id         String     @id @default(auto()) @map("_id") @db.ObjectId
   title      String
-  isPrivate  Boolean    @default(false)
+  visibility  QuizVisibility    @default(PRIVATE)
   status     QuizStatus @default(DRAFT)
   coverImage String?
 

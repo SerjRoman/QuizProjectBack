@@ -1,35 +1,14 @@
 import { PrismaKnownError } from '#types';
 import { ConflictError, NotFoundError, PrismaErrors } from '@errors';
-import type { IQuizRepository, QuizSelect } from './quiz.types';
 import { PrismaClient } from '@prisma';
+import { IQuizRepository } from './types/quiz.contract';
 
 export const QuizRepository: IQuizRepository = {
-    getById: async function <S extends QuizSelect>(id: string, select?: S) {
+    get: async function (where, select) {
         try {
             return await PrismaClient.quiz.findUniqueOrThrow({
-                where: { id: id },
-                select,
-            });
-        } catch (error) {
-            if (error instanceof PrismaKnownError) {
-                switch (error.code) {
-                    case PrismaErrors.NOT_FOUND:
-                        throw new NotFoundError('Quiz');
-                    default:
-                        throw error;
-                }
-            }
-            throw error;
-        }
-    },
-    getAll: async function (include, omit, limit, offset, where) {
-        try {
-            return await PrismaClient.quiz.findMany({
-                include,
-                omit,
-                skip: offset,
-                take: limit,
                 where,
+                select,
             });
         } catch (error) {
             if (error instanceof PrismaKnownError) {
@@ -60,10 +39,10 @@ export const QuizRepository: IQuizRepository = {
             throw error;
         }
     },
-    delete: async function (id) {
+    delete: async function (where) {
         try {
             return await PrismaClient.quiz.delete({
-                where: { id },
+                where,
             });
         } catch (error) {
             if (error instanceof PrismaKnownError) {
@@ -93,6 +72,29 @@ export const QuizRepository: IQuizRepository = {
                 switch (error.code) {
                     case PrismaErrors.NOT_FOUND:
                         throw new NotFoundError('Quiz');
+                    default:
+                        throw error;
+                }
+            }
+            throw error;
+        }
+    },
+    update: async function (where, data) {
+        try {
+            return await PrismaClient.quiz.update({
+                where,
+                data: {
+                    ...data,
+                    updatedAt: new Date(),
+                },
+            });
+        } catch (error) {
+            if (error instanceof PrismaKnownError) {
+                switch (error.code) {
+                    case PrismaErrors.NOT_FOUND:
+                        throw new NotFoundError('Quiz');
+                    case PrismaErrors.CONFLICT:
+                        throw new ConflictError();
                     default:
                         throw error;
                 }
