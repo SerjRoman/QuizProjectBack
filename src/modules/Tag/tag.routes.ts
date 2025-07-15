@@ -11,3 +11,4 @@ router.get(
     validateMiddleware(TagSchema.getAll),
     TagController.getAll,
 );
+export { router as TagRoutes };
