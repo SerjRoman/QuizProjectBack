@@ -12,4 +12,4 @@ router.get(
     LanguageController.getAll,
 );
 
-export {router as LanguageRouter}
+export { router as LanguageRoutes };
