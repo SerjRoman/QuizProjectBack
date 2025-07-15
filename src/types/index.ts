@@ -1,3 +1,3 @@
-export type { PrismaKnownError } from './prisma';
-export type { KeysArray } from './helper';
-export type { AuthResponse, AuthRequest } from './express';
+export type { KeysArray } from './keys-array';
+export { PrismaKnownError } from './prisma';
+export type { AuthRequest, AuthResponse } from './express';

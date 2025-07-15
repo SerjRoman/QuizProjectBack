@@ -45,12 +45,8 @@ export const QuizService: IQuizService = {
             where,
         );
     },
-    getById: async function (id, include, omit) {
-        return await QuizRepository.getById<typeof include, typeof omit>(
-            id,
-            include,
-            omit,
-        );
+    getById: async function (id, select) {
+        return await QuizRepository.getById<typeof select>(id, select);
     },
     create: async function (data) {
         return await QuizRepository.create(data);

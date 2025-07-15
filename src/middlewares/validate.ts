@@ -3,7 +3,7 @@ import { ValidationError } from 'src/errors/app-errors';
 import { AnySchema, ValidationError as YupValidationError } from 'yup';
 
 export const validateMiddleware = (schema: AnySchema) =>
-    async function (req: Request, res: Response, next: NextFunction) {
+    async function (req: Request, _: Response, next: NextFunction) {
         try {
             const validated = await schema.validate(
                 {

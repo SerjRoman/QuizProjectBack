@@ -1,5 +1,6 @@
+import { arrayToBooleanObject } from '@utils';
 import { UserService } from './user.service';
-import { IUserController, UserInclude, UserOmit } from './user.types';
+import { IUserController } from './user.types';
 
 export const UserController: IUserController = {
     create: async function (req, res, next) {
@@ -12,26 +13,8 @@ export const UserController: IUserController = {
     },
     getById: async function (req, res, next) {
         try {
-            const include: UserInclude = {};
-            const omit: UserOmit = {};
-            const query = req.query;
-            if (query) {
-                if (query.include) {
-                    query.include.forEach((q) => {
-                        include[q] = true;
-                    });
-                }
-                if (query.omit) {
-                    query.omit.forEach((q) => {
-                        omit[q] = true;
-                    });
-                }
-            }
-            const user = await UserService.getById(
-                req.params.id,
-                include,
-                omit,
-            );
+            const select = arrayToBooleanObject(req.query?.select);
+            const user = await UserService.getById(req.params.id, select);
             res.status(200).json(user);
         } catch (error) {
             next(error);
@@ -58,11 +41,8 @@ export const UserController: IUserController = {
 
     me: async function (req, res, next) {
         try {
-            const user = await UserService.getById(
-                res.locals.userId,
-                {},
-                { password: true },
-            );
+            const select = arrayToBooleanObject(req.query?.select);
+            const user = await UserService.getById(res.locals.userId, select);
             res.status(200).json(user);
         } catch (error) {
             next(error);

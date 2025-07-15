@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { UserRoutes } from '@src/modules/User';
-import { QuizRoutes } from '@src/modules/Quiz/';
+import { UserRoutes } from '@modules/User';
+import { QuizRoutes } from '@modules/Quiz';
 
 const AppRouter = Router();
 

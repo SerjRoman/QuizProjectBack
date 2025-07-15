@@ -1,23 +1,20 @@
 import * as yup from 'yup';
 import {
-    QuizIncludeArray,
-    QuizOmitArray,
-    QuizSelectArray,
-    QuizStatusArray,
+    QUIZ_INCLUDE,
+    QUIZ_OMIT,
+    QUIZ_SELECT,
+    QUIZ_STATUS,
 } from './quiz.constants';
 
 const commonQuizQuerySchema = yup.object({
     include: yup
         .array()
-        .of(yup.string().oneOf(QuizIncludeArray).required())
+        .of(yup.string().oneOf(QUIZ_INCLUDE).required())
         .optional(),
-    omit: yup
-        .array()
-        .of(yup.string().oneOf(QuizOmitArray).required())
-        .optional(),
+    omit: yup.array().of(yup.string().oneOf(QUIZ_OMIT).required()).optional(),
     select: yup
         .array()
-        .of(yup.string().oneOf(QuizSelectArray).required())
+        .of(yup.string().oneOf(QUIZ_SELECT).required())
         .optional(),
     limit: yup.number().optional(),
     offset: yup.number().optional(),
@@ -28,7 +25,7 @@ const getAllFilters = yup.object({
     languages: yup.array().of(yup.string().required()).optional(),
     subject: yup.string().optional(),
     isPrivate: yup.boolean().optional(),
-    status: yup.string().oneOf(QuizStatusArray).optional(),
+    status: yup.string().oneOf(QUIZ_STATUS).optional(),
 });
 
 export const QuizSchema = {
@@ -51,7 +48,14 @@ export const QuizSchema = {
             .concat(commonQuizQuerySchema.optional()),
     }),
     getById: yup.object({
-        query: commonQuizQuerySchema.optional(),
+        query: yup
+            .object({
+                select: yup
+                    .array()
+                    .of(yup.string().oneOf(QUIZ_SELECT).required())
+                    .optional(),
+            })
+            .optional(),
     }),
     delete: yup.object({
         params: yup.object({

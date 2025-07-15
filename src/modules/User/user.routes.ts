@@ -1,8 +1,7 @@
-import { validateMiddleware } from '@src/middlewares/validate';
 import { Router } from 'express';
 import { UserSchema } from './user.schema';
 import { UserController } from './user.controller';
-import { authenticateMiddleware } from '@src/middlewares/authenticate';
+import { authenticateMiddleware, validateMiddleware } from '@middlewares';
 
 const router = Router();
 

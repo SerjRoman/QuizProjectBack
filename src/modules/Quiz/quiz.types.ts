@@ -3,7 +3,7 @@ import {
     Quiz as QuizPrisma,
     QuizStatus as QuizStatusPrisma,
 } from '#prisma/prisma';
-import { AuthRequest, AuthResponse } from '#types/express';
+import { AuthRequest, AuthResponse } from '#types';
 import { InferType } from 'yup';
 import { QuizSchema } from './quiz.schema';
 import { NextFunction } from 'express';
@@ -95,7 +95,7 @@ export interface IQuizController {
             object,
             InferType<typeof QuizSchema.getById>['query']
         >,
-        res: AuthResponse<QuizWithArgs>,
+        res: AuthResponse<QuizWithSelect>,
         next: NextFunction,
     ) => void;
     delete: (
@@ -136,11 +136,7 @@ export interface IQuizService {
         },
         where?: QuizWhere,
     ) => Promise<QuizWithSelect[]>;
-    getById: (
-        id: string,
-        include: QuizInclude,
-        omit: QuizOmit,
-    ) => Promise<QuizWithArgs<QuizInclude, QuizOmit>>;
+    getById: (id: string, select: QuizSelect) => Promise<QuizWithSelect>;
     delete: (id: string) => Promise<Quiz>;
     create: (data: QuizCreateInput) => Promise<Quiz>;
     // update: (data: )
@@ -155,16 +151,15 @@ export interface IQuizRepository {
         where?: QuizWhere,
     ) => Promise<QuizWithArgs<I, O>[]>;
     getAllWithSelect: <S extends QuizSelect>(
-        select: S,
+        select?: S,
         limit?: number,
         offset?: number,
         where?: QuizWhere,
-    ) => Promise<QuizWithSelect<S>[]>;
-    getById: <I extends QuizInclude, O extends QuizOmit>(
+    ) => Promise<QuizWithSelect<S>[] | Quiz[]>;
+    getById: <S extends QuizSelect>(
         id: string,
-        include: I,
-        omit: O,
-    ) => Promise<QuizWithArgs<I, O>>;
+        select?: QuizSelect,
+    ) => Promise<QuizWithSelect<S> | Quiz>;
     delete: (id: string) => Promise<Quiz>;
     create: (data: QuizCreateInput) => Promise<Quiz>;
 }

@@ -1,21 +1,15 @@
-import { PrismaKnownError } from '#types/prisma';
-import {
-    ConflictError,
-    NotFoundError,
-    PrismaErrors,
-} from '@src/errors/app-errors';
-import client from '../../prisma/client';
-import type { IQuizRepository } from './quiz.types';
+import { PrismaKnownError } from '#types';
+import { ConflictError, NotFoundError, PrismaErrors } from '@errors';
+import type { IQuizRepository, QuizSelect } from './quiz.types';
+import { PrismaClient } from '@prisma';
 
 export const QuizRepository: IQuizRepository = {
-    getById: async function (id, include, omit) {
+    getById: async function <S extends QuizSelect>(id: string, select?: S) {
         try {
-            const quiz = await client.quiz.findUniqueOrThrow({
+            return await PrismaClient.quiz.findUniqueOrThrow({
                 where: { id: id },
-                include: include,
-                omit: omit,
+                select,
             });
-            return quiz;
         } catch (error) {
             if (error instanceof PrismaKnownError) {
                 switch (error.code) {
@@ -30,7 +24,7 @@ export const QuizRepository: IQuizRepository = {
     },
     getAll: async function (include, omit, limit, offset, where) {
         try {
-            return await client.quiz.findMany({
+            return await PrismaClient.quiz.findMany({
                 include,
                 omit,
                 skip: offset,
@@ -51,7 +45,7 @@ export const QuizRepository: IQuizRepository = {
     },
     create: async function (data) {
         try {
-            return await client.quiz.create({
+            return await PrismaClient.quiz.create({
                 data,
             });
         } catch (error) {
@@ -68,7 +62,7 @@ export const QuizRepository: IQuizRepository = {
     },
     delete: async function (id) {
         try {
-            return await client.quiz.delete({
+            return await PrismaClient.quiz.delete({
                 where: { id },
             });
         } catch (error) {
@@ -85,7 +79,7 @@ export const QuizRepository: IQuizRepository = {
     },
     getAllWithSelect: async function (select, limit, offset, where) {
         try {
-            return await client.quiz.findMany({
+            return await PrismaClient.quiz.findMany({
                 skip: offset,
                 take: limit,
                 where,

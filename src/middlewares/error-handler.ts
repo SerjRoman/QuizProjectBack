@@ -1,9 +1,9 @@
-import { AppError } from '@src/errors/app-errors';
+import { AppError } from '@errors';
 import { NextFunction, Request, Response } from 'express';
 
-export const errorHandler = (
+export const errorHandlerMiddleware = (
     error: Error,
-    req: Request,
+    _: Request,
     res: Response,
     next: NextFunction,
 ) => {
