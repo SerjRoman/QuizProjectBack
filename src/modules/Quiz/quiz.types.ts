@@ -1,4 +1,8 @@
-import { Prisma, Quiz as QuizPrisma } from '#prisma/prisma';
+import {
+    Prisma,
+    Quiz as QuizPrisma,
+    QuizStatus as QuizStatusPrisma,
+} from '#prisma/prisma';
 import { AuthRequest, AuthResponse } from '#types/express';
 import { InferType } from 'yup';
 import { QuizSchema } from './quiz.schema';
@@ -10,9 +14,12 @@ export type QuizUpdateInput = Prisma.QuizUpdateInput;
 
 export type QuizCreateInput = Prisma.QuizUncheckedCreateInput;
 
+export type QuizStatus = QuizStatusPrisma;
+
 export type QuizInclude = Prisma.QuizInclude;
 export type QuizOmit = Prisma.QuizOmit;
 export type QuizWhere = Prisma.QuizWhereInput;
+export type QuizSelect = Prisma.QuizSelect;
 
 export type QuizWithInclude<I extends QuizInclude = object> =
     Prisma.QuizGetPayload<{
@@ -27,6 +34,8 @@ export type QuizWithArgs<
     I extends QuizInclude = object,
     O extends QuizOmit = object,
 > = Prisma.QuizGetPayload<{ omit: O; include: I }>;
+export type QuizWithSelect<S extends QuizSelect = object> =
+    Prisma.QuizGetPayload<{ select: S }>;
 
 export interface IQuizController {
     getAll: (
@@ -36,7 +45,47 @@ export interface IQuizController {
             object,
             InferType<typeof QuizSchema.getAll>['query']
         >,
-        res: AuthResponse<QuizWithArgs[]>,
+        res: AuthResponse<QuizWithArgs[] | QuizWithSelect[]>,
+        next: NextFunction,
+    ) => void;
+    teacherMy: (
+        req: AuthRequest<
+            object,
+            object,
+            object,
+            InferType<typeof QuizSchema.getAll>['query']
+        >,
+        res: AuthResponse<QuizWithArgs[] | QuizWithSelect[]>,
+        next: NextFunction,
+    ) => void;
+    teacherMyCopied: (
+        req: AuthRequest<
+            object,
+            object,
+            object,
+            InferType<typeof QuizSchema.getAll>['query']
+        >,
+        res: AuthResponse<QuizWithSelect[]>,
+        next: NextFunction,
+    ) => void;
+    teacherMyFavourite: (
+        req: AuthRequest<
+            object,
+            object,
+            object,
+            InferType<typeof QuizSchema.getAll>['query']
+        >,
+        res: AuthResponse<QuizWithSelect[]>,
+        next: NextFunction,
+    ) => void;
+    teacherMyCreated: (
+        req: AuthRequest<
+            object,
+            object,
+            object,
+            InferType<typeof QuizSchema.getAll>['query']
+        >,
+        res: AuthResponse<QuizWithSelect[]>,
         next: NextFunction,
     ) => void;
     getById: (
@@ -70,7 +119,23 @@ export interface IQuizService {
         omit: QuizOmit,
         limit?: number,
         offset?: number,
+        filters?: {
+            tags?: string[] | undefined;
+            languages?: string[] | undefined;
+            subject?: string | undefined;
+        },
     ) => Promise<QuizWithArgs<QuizInclude, QuizOmit>[]>;
+    getAllWithSelect: (
+        select: QuizSelect,
+        limit?: number,
+        offset?: number,
+        filters?: {
+            tags?: string[] | undefined;
+            languages?: string[] | undefined;
+            subject?: string | undefined;
+        },
+        where?: QuizWhere,
+    ) => Promise<QuizWithSelect[]>;
     getById: (
         id: string,
         include: QuizInclude,
@@ -87,7 +152,14 @@ export interface IQuizRepository {
         omit: O,
         limit?: number,
         offset?: number,
+        where?: QuizWhere,
     ) => Promise<QuizWithArgs<I, O>[]>;
+    getAllWithSelect: <S extends QuizSelect>(
+        select: S,
+        limit?: number,
+        offset?: number,
+        where?: QuizWhere,
+    ) => Promise<QuizWithSelect<S>[]>;
     getById: <I extends QuizInclude, O extends QuizOmit>(
         id: string,
         include: I,

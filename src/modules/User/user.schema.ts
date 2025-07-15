@@ -5,7 +5,7 @@ import * as yup from 'yup';
 const commonQueries = yup.object({
     include: yup
         .array()
-        .of(yup.string().oneOf(['TeacherProfile', 'StudentProfile']).required())
+        .of(yup.string().oneOf(['teacherProfile', 'studentProfile']).required())
         .optional(),
     omit: yup
         .array()
@@ -32,6 +32,8 @@ export const UserSchema = {
             username: yup.string().min(3).max(20).required(),
             password: yup.string().min(6).max(50).required(),
             role: yup.string().oneOf(['TEACHER', 'STUDENT']).required(),
+            firstName: yup.string().required(),
+            lastName: yup.string().required(),
         }),
     }),
     update: yup.object({

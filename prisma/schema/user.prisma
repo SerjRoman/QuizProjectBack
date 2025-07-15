@@ -13,7 +13,7 @@ model User {
   role      Role
   avatar    String?
 
-  favourite   Quiz[]   @relation(fields: [favouriteQuzzesIds], references: [id], name: "FaviroteQuizzesRelation")
+  favourite   Quiz[]   @relation(fields: [favouriteQuzzesIds], references: [id], name: "FavouriteQuizzesRelation")
   favouriteQuzzesIds String[] @db.ObjectId
 
   teacherProfile TeacherProfile?
