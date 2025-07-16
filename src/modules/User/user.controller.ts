@@ -1,6 +1,6 @@
 import { arrayToBooleanObject } from '@utils';
 import { UserService } from './user.service';
-import { IUserController } from './user.types';
+import { IUserController } from './types/user.contract';
 
 export const UserController: IUserController = {
     create: async function (req, res, next) {
@@ -29,7 +29,6 @@ export const UserController: IUserController = {
             next(error);
         }
     },
-
     delete: async function (req, res, next) {
         try {
             await UserService.delete(req.params.id);
@@ -60,7 +59,7 @@ export const UserController: IUserController = {
     logout: function (req, res, next) {
         try {
             // Future Redis black list logic?
-            res.status(200).json({});
+            res.status(200).json();
         } catch (error) {
             next(error);
         }

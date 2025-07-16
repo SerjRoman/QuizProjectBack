@@ -1,26 +1,18 @@
-import { $Enums, Prisma, User as PrismaUser } from '#prisma/prisma/';
 import { Request, Response, NextFunction } from 'express';
+import {
+    User,
+    UserCreateInput,
+    UserLoginPayload,
+    UserSelect,
+    UserUpdateInput,
+    UserWhereUnique,
+    UserWithArgs,
+    UserWithoutPassword,
+    UserWithSelect,
+} from './user.domain';
 import { InferType } from 'yup';
-import { UserSchema } from './user.schema';
+import { UserSchema } from '../user.schema';
 import { AuthRequest, AuthResponse } from '#types';
-
-export type User = PrismaUser;
-
-export type UserWithArgs<
-    I extends UserInclude = object,
-    O extends UserOmit = object,
-> = Prisma.UserGetPayload<{ include: I; omit: O }>;
-
-export type UserRolesEnum = $Enums.Role;
-export type UserCreateInput = Prisma.UserUncheckedCreateInput;
-export type UserUpdateInput = Prisma.UserUncheckedUpdateInput;
-export type UserInclude = Prisma.UserInclude;
-export type UserOmit = Prisma.UserOmit;
-export type UserLoginPayload = Pick<User, 'email' | 'password'>;
-
-export type UserSelect = Prisma.UserSelect;
-export type UserWithSelect<S extends UserSelect = object> =
-    Prisma.UserGetPayload<{ select: S }>;
 
 export interface IUserController {
     create: (
@@ -40,7 +32,7 @@ export interface IUserController {
             object,
             InferType<typeof UserSchema.getById>['query']
         >,
-        res: Response<User | UserWithSelect | null>,
+        res: Response<UserWithoutPassword | UserWithSelect | null>,
         next: NextFunction,
     ) => void;
     update: (
@@ -100,6 +92,7 @@ export interface IUserController {
         next: NextFunction,
     ) => void;
 }
+
 export interface IUserService {
     repo: IUserRepository;
     create: (data: UserCreateInput) => Promise<User>;
@@ -112,7 +105,7 @@ export interface IUserService {
     getById: <S extends UserSelect>(
         id: string,
         select: UserSelect,
-    ) => Promise<Omit<User, 'password'> | UserWithSelect<S>>;
+    ) => Promise<UserWithoutPassword | UserWithSelect<S>>;
     update: (id: string, data: UserUpdateInput) => Promise<User>;
     delete: (id: string) => Promise<User>;
     hashPassword: (password: string) => Promise<string>;
@@ -129,15 +122,13 @@ export interface IUserService {
 
 export interface IUserRepository {
     create: (data: UserCreateInput) => Promise<User>;
-    getById: <S extends UserSelect>(
-        id: string,
-        select?: S,
-    ) => Promise<User | UserWithSelect<S>>;
-    update: (id: string, data: UserUpdateInput) => Promise<User>;
-    delete: (id: string) => Promise<User>;
-    getByEmail: <I extends UserInclude = object, O extends UserOmit = object>(
-        email: string,
-        include: I,
-        omit: O,
-    ) => Promise<UserWithArgs<I, O>>;
+    get: {
+        (where: UserWhereUnique): Promise<UserWithoutPassword>;
+        <S extends UserSelect>(
+            where: UserWhereUnique,
+            select?: S,
+        ): Promise<UserWithSelect<S>>;
+    };
+    update: (where: UserWhereUnique, data: UserUpdateInput) => Promise<User>;
+    delete: (where: UserWhereUnique) => Promise<User>;
 }

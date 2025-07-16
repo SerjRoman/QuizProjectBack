@@ -1,7 +1,7 @@
-export function arrayToBooleanObject(
-    arr: string[] | undefined,
-): Record<string, boolean> {
-    if (!arr) return {};
+export function arrayToBooleanObject<K extends string>(
+    arr: K[] | undefined,
+): Record<K, boolean> {
+    if (!arr) return {} as Record<K, boolean>;
 
     const obj: Record<string, boolean> = {};
     const items = Array.isArray(arr) ? arr : [arr];
