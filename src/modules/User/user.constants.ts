@@ -1,5 +1,5 @@
 import { KeysArray } from '#types';
-import { UserRolesEnum, UserSelect } from './user.types';
+import { UserRolesEnum, UserSelectWithoutPassword } from './types/user.domain';
 
 export const ROLES: UserRolesEnum[] = ['STUDENT', 'TEACHER'];
 export const OMIT_FIELDS = [
@@ -15,7 +15,7 @@ export const OMIT_FIELDS = [
     'avatar',
 ];
 
-export const USER_SELECT: KeysArray<UserSelect> = [
+export const USER_SELECT: KeysArray<UserSelectWithoutPassword> = [
     'avatar',
     'createdAt',
     'id',

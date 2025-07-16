@@ -1,16 +1,17 @@
 import { compare, hash } from 'bcryptjs';
 import { UserRepository } from './user.repository';
-import { IUserService } from './user.types';
 import { sign, TokenExpiredError, verify } from 'jsonwebtoken';
 import { StringValue } from 'ms';
 import { AuthenticationError, ConflictError, NotFoundError } from '@errors';
 import { env } from '@config';
+import { isObjectEmpty } from '@utils';
+import { IUserService } from './types/user.contract';
 
 export const UserService: IUserService = {
     repo: UserRepository,
     register: async function (data) {
         try {
-            await this.repo.getByEmail(data.email, {}, {});
+            await this.repo.get({ email: data.email });
             throw new ConflictError('User already exists with this ID');
         } catch (error) {
             if (!(error instanceof NotFoundError)) {
@@ -25,10 +26,9 @@ export const UserService: IUserService = {
         }
     },
     login: async function (data) {
-        const user = await this.repo.getByEmail<object, object>(
-            data.email,
-            {},
-            {},
+        const user = await this.repo.get<{ password: true; id: true }>(
+            { email: data.email },
+            { password: true, id: true },
         );
         const isMatch = await this.comparePasswords(
             user.password,
@@ -42,7 +42,7 @@ export const UserService: IUserService = {
         return { token, refreshToken };
     },
     create: async function (data) {
-        const existingUser = await this.repo.getByEmail(data.email, {}, {});
+        const existingUser = await this.repo.get({ email: data.email });
         if (existingUser) {
             throw new ConflictError('User already exists with this ID');
         }
@@ -52,13 +52,16 @@ export const UserService: IUserService = {
     },
 
     getById: async function (id, select) {
-        return await this.repo.getById<typeof select>(id, select);
+        return await this.repo.get<typeof select>(
+            { id },
+            !isObjectEmpty(select) ? select : undefined,
+        );
     },
     update: async function (id, data) {
-        return await this.repo.update(id, data);
+        return await this.repo.update({ id }, data);
     },
     delete: async function (id) {
-        return await this.repo.delete(id);
+        return await this.repo.delete({ id });
     },
     hashPassword: async function (password) {
         return await hash(password, 10);

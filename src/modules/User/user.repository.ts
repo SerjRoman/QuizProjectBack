@@ -1,16 +1,21 @@
-import { IUserRepository } from './user.types';
 import { PrismaClient } from '@prisma';
 import { PrismaKnownError } from '#types';
 import { NotFoundError, PrismaErrors } from '@errors';
+import { IUserRepository } from './types/user.contract';
 
 export const UserRepository: IUserRepository = {
-    getById: async function (id, select) {
+    get: async function (where, select) {
         try {
-            const user = await PrismaClient.user.findUniqueOrThrow({
-                where: { id: id },
-                select,
+            if (select) {
+                return await PrismaClient.user.findUniqueOrThrow({
+                    where,
+                    select,
+                });
+            }
+            return await PrismaClient.user.findUniqueOrThrow({
+                where,
+                omit: { password: true },
             });
-            return user;
         } catch (error) {
             if (error instanceof PrismaKnownError) {
                 switch (error.code) {
@@ -22,7 +27,7 @@ export const UserRepository: IUserRepository = {
             }
             throw error;
         }
-    },
+    } as IUserRepository['get'],
     create: async function (data) {
         try {
             return await PrismaClient.user.create({
@@ -40,10 +45,10 @@ export const UserRepository: IUserRepository = {
             throw error;
         }
     },
-    update: async function (id, data) {
+    update: async function (where, data) {
         try {
             return await PrismaClient.user.update({
-                where: { id: id },
+                where,
                 data,
             });
         } catch (error) {
@@ -58,31 +63,11 @@ export const UserRepository: IUserRepository = {
             throw error;
         }
     },
-    delete: async function (id) {
+    delete: async function (where) {
         try {
             return await PrismaClient.user.delete({
-                where: { id: id },
+                where,
             });
-        } catch (error) {
-            if (error instanceof PrismaKnownError) {
-                switch (error.code) {
-                    case PrismaErrors.NOT_FOUND:
-                        throw new NotFoundError('User');
-                    default:
-                        throw error;
-                }
-            }
-            throw error;
-        }
-    },
-    getByEmail: async function (email, include, omit) {
-        try {
-            const user = await PrismaClient.user.findUniqueOrThrow({
-                where: { email: email },
-                include: include,
-                omit: omit,
-            });
-            return user;
         } catch (error) {
             if (error instanceof PrismaKnownError) {
                 switch (error.code) {
