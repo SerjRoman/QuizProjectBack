@@ -23,6 +23,19 @@ type CommonTeacherRequest = (
     next: NextFunction,
 ) => void;
 
+type GetAllServiceParams = {
+    select: QuizSelect;
+    limit?: number;
+    offset?: number;
+    filters?: {
+        tags?: string[] | undefined;
+        languages?: string[] | undefined;
+        subject?: string | undefined;
+    };
+    where?: QuizWhere;
+    userId?: string;
+};
+
 export interface IQuizController {
     teacherMy: CommonTeacherRequest;
     teacherMyCopied: CommonTeacherRequest;
@@ -86,17 +99,7 @@ export interface IQuizController {
 }
 
 export interface IQuizService {
-    getAllWithSelect: (
-        select: QuizSelect,
-        limit?: number,
-        offset?: number,
-        filters?: {
-            tags?: string[] | undefined;
-            languages?: string[] | undefined;
-            subject?: string | undefined;
-        },
-        where?: QuizWhere,
-    ) => Promise<QuizWithSelect[]>;
+    getAll: (params: GetAllServiceParams) => Promise<QuizWithSelect[]>;
     getById: (id: string, select: QuizSelect) => Promise<QuizWithSelect>;
     delete: (id: string) => Promise<Quiz>;
     create: (data: QuizCreateInput) => Promise<Quiz>;
@@ -105,12 +108,15 @@ export interface IQuizService {
 }
 
 export interface IQuizRepository {
-    getAllWithSelect: <S extends QuizSelect>(
-        select?: S,
-        limit?: number,
-        offset?: number,
-        where?: QuizWhere,
-    ) => Promise<QuizWithSelect<S>[] | Quiz[]>;
+    getAllWithSelect: {
+        <S extends QuizSelect>(
+            select?: S,
+            limit?: number,
+            offset?: number,
+            where?: QuizWhere,
+        ): Promise<QuizWithSelect<S>[]>;
+        (limit?: number, offset?: number, where?: QuizWhere): Promise<Quiz[]>;
+    };
     get: <S extends QuizSelect>(
         where: QuizWhereUnique,
         select?: QuizSelect,

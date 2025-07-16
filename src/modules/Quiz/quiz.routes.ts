@@ -3,7 +3,7 @@ import { QuizController } from './quiz.controller';
 import { QuizSchema } from './quiz.schema';
 import {
     authenticateMiddleware,
-    isTeacherMiddleware,
+    checkRole,
     validateMiddleware,
 } from '@middlewares';
 
@@ -21,28 +21,28 @@ router.post('/', validateMiddleware(QuizSchema.create), QuizController.create);
 router.get(
     '/teacher/my',
     authenticateMiddleware,
-    isTeacherMiddleware,
+    checkRole('TEACHER'),
     validateMiddleware(QuizSchema.teacherMy),
     QuizController.teacherMy,
 );
 router.get(
     '/teacher/my/created',
     authenticateMiddleware,
-    isTeacherMiddleware,
+    checkRole('TEACHER'),
     validateMiddleware(QuizSchema.teacherMyCreated),
     QuizController.teacherMyCreated,
 );
 router.get(
     '/teacher/my/copied',
     authenticateMiddleware,
-    isTeacherMiddleware,
+    checkRole('TEACHER'),
     validateMiddleware(QuizSchema.teacherMyCopied),
     QuizController.teacherMyCopied,
 );
 router.get(
     '/teacher/my/favourite',
     authenticateMiddleware,
-    isTeacherMiddleware,
+    checkRole('TEACHER'),
     validateMiddleware(QuizSchema.teacherMyFavourite),
     QuizController.teacherMyFavourite,
 );
@@ -51,13 +51,13 @@ router.put(
     '/:id/favourite',
     authenticateMiddleware,
     validateMiddleware(QuizSchema.updateFavourite),
-    QuizController.addToFavourites
+    QuizController.addToFavourites,
 );
 router.delete(
     '/:id/favourite',
     authenticateMiddleware,
     validateMiddleware(QuizSchema.deleteFavourite),
-    QuizController.removeFromFavourites
+    QuizController.removeFromFavourites,
 );
 router.delete(
     '/:id',

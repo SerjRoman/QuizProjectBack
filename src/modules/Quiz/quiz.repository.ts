@@ -58,11 +58,21 @@ export const QuizRepository: IQuizRepository = {
     },
     getAllWithSelect: async function (select, limit, offset, where) {
         try {
+            if (select) {
+                return await PrismaClient.quiz.findMany({
+                    skip: offset,
+                    take: limit,
+                    where,
+                    select,
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
+                });
+            }
             return await PrismaClient.quiz.findMany({
                 skip: offset,
                 take: limit,
                 where,
-                select,
                 orderBy: {
                     createdAt: 'desc',
                 },
@@ -78,7 +88,7 @@ export const QuizRepository: IQuizRepository = {
             }
             throw error;
         }
-    },
+    } as IQuizRepository['getAllWithSelect'],
     update: async function (where, data) {
         try {
             return await PrismaClient.quiz.update({
