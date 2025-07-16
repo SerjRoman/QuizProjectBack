@@ -15,21 +15,20 @@ export const QuizController: IQuizController = {
             const select = arrayToBooleanObject(query?.select);
             const limit = query?.limit ? Number(query.limit) : undefined;
             const offset = query?.offset ? Number(query.offset) : undefined;
-
             const commonFilters = {
                 tags: query?.tags,
                 languages: query?.languages,
                 subject: query?.subject,
             };
-
-            const quizzes = await QuizService.getAllWithSelect(
+            const params = {
                 select,
                 limit,
                 offset,
-                commonFilters,
-                prismaWhereClause,
-            );
+                filters: commonFilters,
+                where: prismaWhereClause,
+            };
 
+            const quizzes = await QuizService.getAll(params);
             res.status(200).json(quizzes);
         } catch (error) {
             next(error);
