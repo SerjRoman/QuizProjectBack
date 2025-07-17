@@ -39,6 +39,9 @@ model TeacherProfile {
   quizFolders QuizFolder[] @relation(name: "QuizFolderOwnerRelation")
 
   classrooms Classroom[] @relation(name: "ClassroomTeacherRelation")
+
+  accessTo Quiz[] @relation(fields: [accessToIds], references: [id],name: "AccessTeacherQuizRelation")
+  accessToIds String[] @db.ObjectId 
 }
 
 model StudentProfile {

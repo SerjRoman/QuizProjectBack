@@ -7,7 +7,7 @@ export const QuizController: IQuizController = {
         req,
         res,
         next,
-        prismaWhereClause,
+        { prismaWhereClause },
     ) {
         try {
             const { query } = req;
@@ -28,7 +28,7 @@ export const QuizController: IQuizController = {
                 where: prismaWhereClause,
             };
 
-            const quizzes = await QuizService.getAll(params);
+            const quizzes = await QuizService.getAllTeacher(params);
             res.status(200).json(quizzes);
         } catch (error) {
             next(error);
@@ -56,13 +56,14 @@ export const QuizController: IQuizController = {
     },
     delete: async function (req, res, next) {
         try {
-            res.status(204).json(await QuizService.delete(req.params.id));
+            await QuizService.delete(req.params.id);
+            res.status(204).json();
         } catch (error) {
             next(error);
         }
     },
     teacherMy: async function (req, res, next) {
-        const whereClause = {
+        const prismaWhereClause = {
             OR: [
                 {
                     copiedBy: {
@@ -74,23 +75,31 @@ export const QuizController: IQuizController = {
                 { createdBy: { userId: res.locals.userId } },
             ],
         };
-        QuizController.handleTeacherQuizRequest(req, res, next, whereClause);
+        QuizController.handleTeacherQuizRequest(req, res, next, {
+            prismaWhereClause,
+        });
     },
     teacherMyCopied: async function (req, res, next) {
-        const whereClause = {
+        const prismaWhereClause = {
             copiedBy: { some: { userId: res.locals.userId } },
         };
-        QuizController.handleTeacherQuizRequest(req, res, next, whereClause);
+        QuizController.handleTeacherQuizRequest(req, res, next, {
+            prismaWhereClause,
+        });
     },
     teacherMyCreated: async function (req, res, next) {
-        const whereClause = { createdBy: { userId: res.locals.userId } };
-        QuizController.handleTeacherQuizRequest(req, res, next, whereClause);
+        const prismaWhereClause = { createdBy: { userId: res.locals.userId } };
+        QuizController.handleTeacherQuizRequest(req, res, next, {
+            prismaWhereClause,
+        });
     },
     teacherMyFavourite: async function (req, res, next) {
-        const whereClause = {
+        const prismaWhereClause = {
             favouritedBy: { some: { id: res.locals.userId } },
         };
-        QuizController.handleTeacherQuizRequest(req, res, next, whereClause);
+        QuizController.handleTeacherQuizRequest(req, res, next, {
+            prismaWhereClause,
+        });
     },
     addToFavourites: async function (req, res, next) {
         try {
@@ -114,6 +123,41 @@ export const QuizController: IQuizController = {
             if (result) {
                 res.status(204).json();
             }
+        } catch (error) {
+            next(error);
+        }
+    },
+    getAccessesToQuiz: async function (req, res, next) {
+        try {
+            const accesses = await QuizService.getAccessesToQuiz(
+                res.locals.userId,
+                req.params.id,
+            );
+            res.status(200).json(accesses);
+        } catch (error) {
+            next(error);
+        }
+    },
+    removeAccessToQuiz: async function (req, res, next) {
+        try {
+            await QuizService.deleteAccess(
+                res.locals.userId,
+                req.params.id,
+                req.body.userId,
+            );
+            res.status(204).json();
+        } catch (error) {
+            next(error);
+        }
+    },
+    giveAccessToQuiz: async function (req, res, next) {
+        try {
+            await QuizService.updateAccess(
+                res.locals.userId,
+                req.params.id,
+                req.body.username,
+            );
+            res.status(204).json();
         } catch (error) {
             next(error);
         }

@@ -33,3 +33,20 @@ export type QuizWithArgs<
 > = Prisma.QuizGetPayload<{ omit: O; include: I }>;
 export type QuizWithSelect<S extends QuizSelect = object> =
     Prisma.QuizGetPayload<{ select: S }>;
+
+export type QuizAccessedToSelect = {
+    accessedTo: {
+        select: {
+            user: {
+                select: {
+                    id: true;
+                    firstName: true;
+                    lastName: true;
+                };
+            };
+        };
+    };
+    createdById: true;
+};
+
+export type QuizAccessedTo = QuizWithSelect<QuizAccessedToSelect>;

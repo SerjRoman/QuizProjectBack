@@ -2,24 +2,19 @@ import { PrismaClient } from './client';
 
 async function seed() {
     try {
-        // const quiz = await client.quiz.create({
-        //     data: {
-        //         title: 'Quiz 1',
-        //         subject: {
-        //             create: {
-        //                 slug: 'maths',
-        //                 name: 'Mathematics'
-        //             }
-        //         },
-        //     }
-        // });
-        const user = await PrismaClient.user.findUnique({
+        const quiz = await PrismaClient.quiz.update({
             where: {
-                id: '',
+                id: '6872a04f13457305e1bbfc19'
             },
+            data: {
+                copiedBy: {
+                    connect: {
+                        id: "6873d5137f36cf60cff4d7b1"
+                    }
+                }
+            }
         });
-        console.log(user);
-        // console.log(quiz);
+        console.log(quiz)
     } catch (error) {
         console.error('Error while deleting users:', error);
     } finally {
