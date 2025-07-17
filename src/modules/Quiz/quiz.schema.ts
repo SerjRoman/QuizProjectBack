@@ -121,4 +121,9 @@ export const QuizSchema = {
             shuffleAnswers: yup.boolean().optional(),
         }),
     }),
+    copyQuiz: yup.object({
+        body: yup.object({
+            id: yup.string().length(24).required(),
+        }),
+    }),
 };

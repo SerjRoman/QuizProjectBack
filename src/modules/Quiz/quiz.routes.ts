@@ -85,5 +85,10 @@ router.delete(
     validateMiddleware(QuizSchema.delete),
     QuizController.delete,
 );
+router.post(
+    '/teacher/copy',
+    validateMiddleware(QuizSchema.copyQuiz),
+    QuizController.copyQuiz,
+);
 
 export { router as QuizRoutes };

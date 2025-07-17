@@ -40,6 +40,15 @@ export interface IQuizController {
     teacherMyCopied: CommonTeacherRequest;
     teacherMyFavourite: CommonTeacherRequest;
     teacherMyCreated: CommonTeacherRequest;
+    teacherMyAccessed: CommonTeacherRequest;
+    copyQuiz: AuthControllerContract<
+        AuthRequest<
+            object,
+            object,
+            InferType<typeof QuizSchema.copyQuiz>['body']
+        >,
+        AuthResponse<Quiz>
+    >;
     getById: AuthControllerContract<
         AuthRequest<
             InferType<typeof QuizSchema.getById>['params'],
@@ -118,6 +127,7 @@ export interface IQuizService {
         username: string,
     ) => Promise<Quiz>;
     deleteAccess: (userId: string, quizId: string, id: string) => Promise<Quiz>;
+    copyQuiz: (userId: string, quizId: string) => Promise<Quiz>;
 }
 
 export interface IQuizRepository {
@@ -131,11 +141,11 @@ export interface IQuizRepository {
         (limit?: number, offset?: number, where?: QuizWhere): Promise<Quiz[]>;
     };
     get: {
+        (where: QuizWhereUnique): Promise<Quiz>;
         <S extends QuizSelect>(
             where: QuizWhereUnique,
             select?: QuizSelect,
         ): Promise<QuizWithSelect<S>>;
-        (where: QuizWhereUnique): Promise<Quiz>;
     };
     delete: (where: QuizWhereUnique) => Promise<Quiz>;
     create: (data: QuizCreateInput) => Promise<Quiz>;
