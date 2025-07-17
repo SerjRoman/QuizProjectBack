@@ -22,7 +22,7 @@ export const QuizSchema = {
     create: yup
         .object({
             body: yup.object({
-                title: yup.string().required('Title is required'),
+                title: yup.string().min(3).required('Title is required'),
                 subjectId: yup
                     .string()
                     .length(24)
@@ -49,6 +49,9 @@ export const QuizSchema = {
                     .optional(),
             })
             .optional(),
+        params: yup.object({
+            id: yup.string().length(24).required(),
+        }),
     }),
     delete: yup.object({
         params: yup.object({
@@ -83,6 +86,27 @@ export const QuizSchema = {
     deleteFavourite: yup.object({
         params: yup.object({
             id: yup.string().length(24).required(),
+        }),
+    }),
+    getAccessesToQuiz: yup.object({
+        params: yup.object({
+            id: yup.string().length(24).required(),
+        }),
+    }),
+    updateAccess: yup.object({
+        params: yup.object({
+            id: yup.string().length(24).required(),
+        }),
+        body: yup.object({
+            username: yup.string().required(),
+        }),
+    }),
+    deleteAccess: yup.object({
+        params: yup.object({
+            id: yup.string().length(24).required(),
+        }),
+        body: yup.object({
+            userId: yup.string().length(24).required(),
         }),
     }),
     patch: yup.object({

@@ -46,6 +46,27 @@ router.get(
     validateMiddleware(QuizSchema.teacherMyFavourite),
     QuizController.teacherMyFavourite,
 );
+router.get(
+    '/teacher/:id/access',
+    authenticateMiddleware,
+    checkRole('TEACHER'),
+    validateMiddleware(QuizSchema.getAccessesToQuiz),
+    QuizController.teacherMyFavourite,
+);
+router.put(
+    '/teacher/:id/access',
+    authenticateMiddleware,
+    checkRole('TEACHER'),
+    validateMiddleware(QuizSchema.updateAccess),
+    QuizController.giveAccessToQuiz,
+);
+router.delete(
+    '/teacher/:id/access',
+    authenticateMiddleware,
+    checkRole('TEACHER'),
+    validateMiddleware(QuizSchema.deleteAccess),
+    QuizController.removeAccessToQuiz,
+);
 
 router.put(
     '/:id/favourite',
