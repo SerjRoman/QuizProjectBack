@@ -1,7 +1,8 @@
 import { arrayToBooleanObject } from '@utils';
 import { QuizService } from './quiz.service';
-import type { QuizCreateInput } from './types/quiz.domain';
+import type { QuizCreateInput, QuizWhere } from './types/quiz.domain';
 import type { IQuizController } from './types/quiz.contract';
+
 export const QuizController: IQuizController = {
     handleTeacherQuizRequest: async function (
         req,
@@ -63,7 +64,7 @@ export const QuizController: IQuizController = {
         }
     },
     teacherMy: async function (req, res, next) {
-        const prismaWhereClause = {
+        const prismaWhereClause: QuizWhere = {
             OR: [
                 {
                     copiedBy: {
@@ -73,6 +74,7 @@ export const QuizController: IQuizController = {
                     },
                 },
                 { createdBy: { userId: res.locals.userId } },
+                { accessedTo: { some: { userId: res.locals.userId } } },
             ],
         };
         QuizController.handleTeacherQuizRequest(req, res, next, {
@@ -96,6 +98,14 @@ export const QuizController: IQuizController = {
     teacherMyFavourite: async function (req, res, next) {
         const prismaWhereClause = {
             favouritedBy: { some: { id: res.locals.userId } },
+        };
+        QuizController.handleTeacherQuizRequest(req, res, next, {
+            prismaWhereClause,
+        });
+    },
+    teacherMyAccessed: async function (req, res, next) {
+        const prismaWhereClause = {
+            accessedTo: { some: { userId: res.locals.userId } },
         };
         QuizController.handleTeacherQuizRequest(req, res, next, {
             prismaWhereClause,
@@ -158,6 +168,15 @@ export const QuizController: IQuizController = {
                 req.body.username,
             );
             res.status(204).json();
+        } catch (error) {
+            next(error);
+        }
+    },
+    copyQuiz: async function (req, res, next) {
+        try {
+            res.status(201).json(
+                await QuizService.copyQuiz(res.locals.userId, req.body.id),
+            );
         } catch (error) {
             next(error);
         }

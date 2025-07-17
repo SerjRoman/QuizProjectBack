@@ -8,6 +8,8 @@ import {
 } from './types/quiz.domain';
 import { ForbiddenError } from '@errors';
 import { UserRepository } from '@modules/User';
+import { InputJsonValue } from '#types';
+import { QUIZ_COPY_SELECT } from './constants/quiz.constants';
 
 const _manageFavouriteConnection = (
     userId: string,
@@ -117,15 +119,17 @@ export const QuizService: IQuizService = {
         if (data.tagsIds && 'length' in data.tagsIds) {
             const connectTags = data.tagsIds.map((tagId) => ({ id: tagId }));
             prismaData.tags = { connect: connectTags };
+            prismaData.tagsIds = undefined;
         }
         if (data.languagesIds && 'length' in data.languagesIds) {
-            const connectTags = data.languagesIds.map((languageId) => ({
+            const connectLanguages = data.languagesIds.map((languageId) => ({
                 id: languageId,
             }));
-            prismaData.tags = { connect: connectTags };
+            prismaData.languages = { connect: connectLanguages };
+            prismaData.languagesIds = undefined;
         }
-
-        return await QuizRepository.create(data);
+        console.log(prismaData);
+        return await QuizRepository.create(prismaData);
     },
     delete: async function (id) {
         return await QuizRepository.delete({ id });
@@ -170,7 +174,6 @@ export const QuizService: IQuizService = {
                 createdBy: { select: { userId: true } },
             },
         );
-        console.log(quiz, ownerId);
         if (quiz.createdBy.userId !== ownerId) {
             throw new ForbiddenError(
                 'You cannot get access of a quiz that you did not create',
@@ -205,5 +208,41 @@ export const QuizService: IQuizService = {
             'disconnect',
         );
     },
-
+    copyQuiz: async function (userId, quizId) {
+        const { teacherProfile } = await UserRepository.get(
+            { id: userId },
+            { teacherProfile: { select: { id: true } } },
+        );
+        if (!teacherProfile) {
+            throw new ForbiddenError(
+                'You cannot copy quiz without TeacherProfile',
+            );
+        }
+        const quizToCopy = await QuizRepository.get<typeof QUIZ_COPY_SELECT>(
+            { id: quizId },
+            QUIZ_COPY_SELECT,
+        );
+        const questionsToCopy = quizToCopy.questions
+            .filter((q) => {
+                if (q.data) return true;
+            })
+            .map((q) => ({ type: q.type, data: q.data as InputJsonValue }));
+        const dataToCreateQuiz: QuizCreateInput = {
+            status: 'DRAFT',
+            title: `Copied ${quizToCopy.title}`,
+            subjectId: quizToCopy.subjectId,
+            tagsIds: quizToCopy.tagsIds,
+            languagesIds: quizToCopy.languagesIds,
+            shuffleAnswers: quizToCopy.shuffleAnswers,
+            shuffleQuestions: quizToCopy.shuffleQuestions,
+            visibility: quizToCopy.visibility,
+            coverImage: quizToCopy.coverImage,
+            questions:
+                questionsToCopy.length > 0
+                    ? { createMany: { data: questionsToCopy } }
+                    : undefined,
+            createdById: teacherProfile.id,
+        };
+        return await this.create(dataToCreateQuiz);
+    },
 };

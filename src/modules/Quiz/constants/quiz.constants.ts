@@ -69,3 +69,15 @@ export const QUIZ_INCLUDE: KeysArray<QuizInclude> = [
     'tags',
 ];
 export const QUIZ_STATUS: QuizStatus[] = ['PUBLISHED', 'DRAFT'];
+
+export const QUIZ_COPY_SELECT = {
+    questions: true,
+    title: true,
+    subjectId: true,
+    tagsIds: true,
+    languagesIds: true,
+    shuffleAnswers: true,
+    shuffleQuestions: true,
+    visibility: true,
+    coverImage: true,
+};
