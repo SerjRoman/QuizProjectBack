@@ -1,4 +1,11 @@
-import { AuthRequest, AuthResponse, AuthControllerContract } from '#types';
+import {
+    AuthRequest,
+    AuthResponse,
+    AuthControllerContract,
+    PaginationType,
+    PaginatedResult,
+    PaginationData,
+} from '#types';
 import { InferType } from 'yup';
 import { QuizSchema } from '../quiz.schema';
 import {
@@ -19,19 +26,19 @@ type CommonTeacherRequest = AuthControllerContract<
         object,
         InferType<typeof QuizSchema.getAll>['query']
     >,
-    AuthResponse<QuizWithSelect[] | Quiz[]>
+    AuthResponse<{ data: QuizWithSelect[] | Quiz[]; meta?: PaginationData }>
 >;
 
 type GetAllServiceParams = {
     select: QuizSelect;
-    limit?: number;
-    offset?: number;
     filters?: {
-        tags?: string[] | undefined;
-        languages?: string[] | undefined;
-        subject?: string | undefined;
+        tags?: string[];
+        languages?: string[];
+        subject?: string;
+        search?: string;
     };
     where?: QuizWhere;
+    pagination?: PaginationType;
     userId?: string;
 };
 
@@ -77,7 +84,10 @@ export interface IQuizController {
             object,
             InferType<typeof QuizSchema.getAll>['query']
         >,
-        AuthResponse<QuizWithSelect[] | Quiz[]>,
+        AuthResponse<{
+            data: QuizWithSelect[] | Quiz[];
+            meta?: PaginationData;
+        }>,
         { prismaWhereClause: QuizWhere }
     >;
     addToFavourites: AuthControllerContract<
@@ -111,7 +121,9 @@ export interface IQuizController {
 }
 
 export interface IQuizService {
-    getAllTeacher: (params: GetAllServiceParams) => Promise<QuizWithSelect[]>;
+    getAllTeacher: (
+        params: GetAllServiceParams,
+    ) => Promise<{ data: QuizWithSelect[] | Quiz[]; meta?: PaginationData }>;
     getById: (id: string, select: QuizSelect) => Promise<QuizWithSelect>;
     delete: (id: string) => Promise<Quiz>;
     create: (data: QuizCreateInput) => Promise<Quiz>;
@@ -134,11 +146,16 @@ export interface IQuizRepository {
     getAllWithSelect: {
         <S extends QuizSelect>(
             select?: S,
-            limit?: number,
-            offset?: number,
             where?: QuizWhere,
         ): Promise<QuizWithSelect<S>[]>;
-        (limit?: number, offset?: number, where?: QuizWhere): Promise<Quiz[]>;
+        (where?: QuizWhere): Promise<Quiz[]>;
+    };
+    getAllWithPagination: {
+        <S extends QuizSelect>(
+            pagination: PaginationType,
+            select?: S,
+            where?: QuizWhere,
+        ): Promise<PaginatedResult<QuizWithSelect<S>[]>>;
     };
     get: {
         (where: QuizWhereUnique): Promise<Quiz>;

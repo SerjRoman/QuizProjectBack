@@ -9,7 +9,7 @@ export const parseJsonQueryMiddleware = (
         const value = req.query[key];
 
         if (typeof value === 'string') {
-            if (!isNaN(Number(value))) {
+            if (value && !isNaN(Number(value))) {
                 req.query[key] = Number(value);
             }
 

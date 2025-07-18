@@ -39,6 +39,7 @@
     "nodemon": "^3.1.10",
     "plop": "^4.0.1",
     "prisma": "^6.1.0",
+    "prisma-extension-pagination": "^0.7.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "yup": "^1.6.1"

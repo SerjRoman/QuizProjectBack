@@ -12,25 +12,25 @@ export const QuizController: IQuizController = {
     ) {
         try {
             const { query } = req;
-
             const select = arrayToBooleanObject(query?.select);
-            const limit = query?.limit ? Number(query.limit) : undefined;
-            const offset = query?.offset ? Number(query.offset) : undefined;
+            const perPage = query?.perPage ? Number(query.perPage) : undefined;
+            const page = query?.page ? Number(query.page) : undefined;
+            const pagination = perPage && page ? { perPage, page } : undefined;
             const commonFilters = {
                 tags: query?.tags,
                 languages: query?.languages,
                 subject: query?.subject,
+                search: query?.search,
             };
             const params = {
                 select,
-                limit,
-                offset,
                 filters: commonFilters,
                 where: prismaWhereClause,
+                pagination,
             };
 
-            const quizzes = await QuizService.getAllTeacher(params);
-            res.status(200).json(quizzes);
+            const result = await QuizService.getAllTeacher(params);
+            res.status(200).json(result);
         } catch (error) {
             next(error);
         }

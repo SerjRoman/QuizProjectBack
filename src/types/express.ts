@@ -16,5 +16,18 @@ export type AuthControllerContract<Req, Res, Params = void> = (
     req: Req,
     res: Res,
     next: NextFunction,
-    params: Params
+    params: Params,
 ) => void;
+
+export type PaginationType = { page: number; perPage: number };
+export type PaginationData = {
+    isFirstPage: boolean;
+    isLastPage: boolean;
+    currentPage: number;
+    previousPage: number | null;
+    nextPage: number | null;
+    pageCount: number;
+    totalCount: number;
+};
+
+export type PaginatedResult<T> = [T, PaginationData];
