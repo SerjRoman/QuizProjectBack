@@ -56,11 +56,9 @@ export const QuizRepository: IQuizRepository = {
             throw error;
         }
     },
-    getAllWithSelect: async function (select, limit, offset, where) {
+    getAllWithSelect: async function (select, where) {
         try {
             return await PrismaClient.quiz.findMany({
-                skip: offset,
-                take: limit,
                 where,
                 select,
                 orderBy: {
@@ -79,6 +77,33 @@ export const QuizRepository: IQuizRepository = {
             throw error;
         }
     } as IQuizRepository['getAllWithSelect'],
+    getAllWithPagination: async function (pagination, select, where) {
+        try {
+            const result = await PrismaClient.quiz
+                .paginate({
+                    select,
+                    where,
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
+                })
+                .withPages({
+                    page: pagination.page,
+                    limit: pagination.perPage,
+                });
+            return [result[0], result[1]];
+        } catch (error) {
+            if (error instanceof PrismaKnownError) {
+                switch (error.code) {
+                    case PrismaErrors.NOT_FOUND:
+                        throw new NotFoundError('Quiz');
+                    default:
+                        throw error;
+                }
+            }
+            throw error;
+        }
+    } as IQuizRepository['getAllWithPagination'],
     update: async function (where, data) {
         try {
             return await PrismaClient.quiz.update({

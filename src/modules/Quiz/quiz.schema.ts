@@ -6,8 +6,8 @@ const commonQuizQuerySchema = yup.object({
         .array()
         .of(yup.string().oneOf(QUIZ_SELECT).required())
         .optional(),
-    limit: yup.number().optional(),
-    offset: yup.number().optional(),
+    page: yup.number().optional(),
+    perPage: yup.number().optional(),
 });
 
 const getAllFilters = yup.object({
@@ -16,6 +16,7 @@ const getAllFilters = yup.object({
     subject: yup.string().optional(),
     isPrivate: yup.boolean().optional(),
     status: yup.string().oneOf(QUIZ_STATUS).optional(),
+    search: yup.string().optional(),
 });
 
 export const QuizSchema = {

@@ -8,105 +8,57 @@ import {
 } from './types/quiz.domain';
 import { ForbiddenError } from '@errors';
 import { UserRepository } from '@modules/User';
-import { InputJsonValue } from '#types';
 import { QUIZ_COPY_SELECT } from './constants/quiz.constants';
+import { QuizBuilder } from './quiz.builder';
+import { PaginationData } from '#types';
 
-const _manageFavouriteConnection = (
-    userId: string,
-    quizId: string,
-    action: 'connect' | 'disconnect',
-) => {
-    return QuizRepository.update(
-        { id: quizId },
-        {
-            favouritedBy: {
-                [action]: {
-                    id: userId,
-                },
-            },
-        },
-    );
-};
-const _manageAccessConnection = (
-    userId: string,
-    quizId: string,
-    action: 'connect' | 'disconnect',
-) => {
-    return QuizRepository.update(
-        { id: quizId },
-        {
-            accessedTo: {
-                [action]: {
-                    userId,
-                },
-            },
-        },
-    );
-};
 export const QuizService: IQuizService = {
     getAllTeacher: async function ({
         select,
-        limit,
-        offset,
         filters,
         where,
         userId,
+        pagination,
     }) {
-        const dynamicSelect = {
+        let dynamicSelect = {
             ...select,
         };
-        const prismaWhere: QuizWhere = { ...where };
-        if (filters) {
-            const { tags, languages, subject } = filters;
-            if (tags) {
-                prismaWhere.tags = { some: { name: { in: tags } } };
-            }
-            if (languages) {
-                prismaWhere.languages = { some: { name: { in: languages } } };
-            }
-            if (subject) {
-                prismaWhere.subject = { name: subject };
-            }
+        const prismaWhere: QuizWhere = QuizBuilder.buildWhereFromFilters(
+            where,
+            filters,
+        );
+        if (select.createdBy) {
+            dynamicSelect = QuizBuilder.buildSelectWithCreatedBy(dynamicSelect);
         }
-        if (select) {
-            if (select.createdBy) {
-                dynamicSelect.createdBy = {
-                    select: { user: { select: { avatar: true } } },
-                };
-            }
-            if (select.favouritedByIds) {
-                dynamicSelect._count = {
-                    select: {
-                        favouritedBy: {
-                            where: {
-                                id: userId,
-                            },
-                        },
-                    },
-                };
-            }
+        if (select.favouritedByIds) {
+            dynamicSelect = QuizBuilder.buildSelectWithFavourite(
+                dynamicSelect,
+                userId,
+            );
+        }
+        let quizzes = [];
+        let meta: PaginationData | undefined;
+        if (pagination) {
+            [quizzes, meta] = await QuizRepository.getAllWithPagination<
+                typeof dynamicSelect
+            >(
+                pagination,
+                !isObjectEmpty(dynamicSelect) ? dynamicSelect : undefined,
+                prismaWhere,
+            );
+        } else {
+            quizzes = await QuizRepository.getAllWithSelect<
+                typeof dynamicSelect
+            >(
+                !isObjectEmpty(dynamicSelect) ? dynamicSelect : undefined,
+                prismaWhere,
+            );
         }
 
-        const quizzes = await QuizRepository.getAllWithSelect<
-            typeof dynamicSelect
-        >(
-            !isObjectEmpty(dynamicSelect) ? dynamicSelect : undefined,
-            limit,
-            offset,
-            prismaWhere,
-        );
-        if (select && select.favouritedByIds) {
-            const enrichedQuizzes = quizzes.map((quiz) => {
-                const { _count, ...restOfQuiz } = quiz;
-                const isFavourite = _count.favouritedBy > 0;
-                return {
-                    ...restOfQuiz,
-                    isFavourite,
-                };
-            });
-            return enrichedQuizzes;
+        if (select.favouritedByIds) {
+            quizzes = QuizBuilder.enrichQuizzesWithFavouriteStatus(quizzes);
         }
-        return quizzes;
+        return { data: quizzes, meta };
     },
     getById: async function (id, select) {
         return await QuizRepository.get<typeof select>(
@@ -115,30 +67,28 @@ export const QuizService: IQuizService = {
         );
     },
     create: async function (data) {
-        const prismaData: QuizCreateInput = { ...data };
-        if (data.tagsIds && 'length' in data.tagsIds) {
-            const connectTags = data.tagsIds.map((tagId) => ({ id: tagId }));
-            prismaData.tags = { connect: connectTags };
-            prismaData.tagsIds = undefined;
-        }
-        if (data.languagesIds && 'length' in data.languagesIds) {
-            const connectLanguages = data.languagesIds.map((languageId) => ({
-                id: languageId,
-            }));
-            prismaData.languages = { connect: connectLanguages };
-            prismaData.languagesIds = undefined;
-        }
-        console.log(prismaData);
+        let prismaData: QuizCreateInput = { ...data };
+        prismaData = QuizBuilder.buildCreateDataWithTags(data, prismaData);
+        prismaData = QuizBuilder.buildCreateDataWithLanguages(data, prismaData);
+
         return await QuizRepository.create(prismaData);
     },
     delete: async function (id) {
         return await QuizRepository.delete({ id });
     },
     updateFavourite: async function (userId, quizId) {
-        return await _manageFavouriteConnection(userId, quizId, 'connect');
+        return await QuizBuilder.manageFavouriteConnection(
+            userId,
+            quizId,
+            'connect',
+        );
     },
     deleteFavourite: async function (userId, quizId) {
-        return await _manageFavouriteConnection(userId, quizId, 'disconnect');
+        return await QuizBuilder.manageFavouriteConnection(
+            userId,
+            quizId,
+            'disconnect',
+        );
     },
     getAccessesToQuiz: async function (userId, quizId) {
         const accesses = await QuizRepository.get<QuizAccessedToSelect>(
@@ -183,7 +133,7 @@ export const QuizService: IQuizService = {
             { username },
             { id: true },
         );
-        return await _manageAccessConnection(
+        return await QuizBuilder.manageAccessConnection(
             userToGiveAccess.id,
             quizId,
             'connect',
@@ -202,7 +152,7 @@ export const QuizService: IQuizService = {
                 'You cannot get access of a quiz that you did not create',
             );
         }
-        return await _manageAccessConnection(
+        return await QuizBuilder.manageAccessConnection(
             userToGiveAccessId,
             quizId,
             'disconnect',
@@ -222,27 +172,10 @@ export const QuizService: IQuizService = {
             { id: quizId },
             QUIZ_COPY_SELECT,
         );
-        const questionsToCopy = quizToCopy.questions
-            .filter((q) => {
-                if (q.data) return true;
-            })
-            .map((q) => ({ type: q.type, data: q.data as InputJsonValue }));
-        const dataToCreateQuiz: QuizCreateInput = {
-            status: 'DRAFT',
-            title: `Copied ${quizToCopy.title}`,
-            subjectId: quizToCopy.subjectId,
-            tagsIds: quizToCopy.tagsIds,
-            languagesIds: quizToCopy.languagesIds,
-            shuffleAnswers: quizToCopy.shuffleAnswers,
-            shuffleQuestions: quizToCopy.shuffleQuestions,
-            visibility: quizToCopy.visibility,
-            coverImage: quizToCopy.coverImage,
-            questions:
-                questionsToCopy.length > 0
-                    ? { createMany: { data: questionsToCopy } }
-                    : undefined,
-            createdById: teacherProfile.id,
-        };
+        const dataToCreateQuiz: QuizCreateInput = QuizBuilder.buildQuizCopyData(
+            quizToCopy,
+            teacherProfile.id,
+        );
         return await this.create(dataToCreateQuiz);
     },
 };

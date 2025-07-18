@@ -4,4 +4,7 @@ export type {
     AuthRequest,
     AuthResponse,
     AuthControllerContract,
+    PaginationType,
+    PaginatedResult,
+    PaginationData,
 } from './express';
