@@ -1,5 +1,11 @@
 import * as yup from 'yup';
-import { QUIZ_SELECT, QUIZ_STATUS } from './constants/quiz.constants';
+import {
+    ORDER_OPTIONS,
+    QUIZ_SELECT,
+    QUIZ_STATUS,
+    QUIZ_VISIBILITY,
+    SORT_FIELD_OPTIONS,
+} from './constants';
 
 const commonQuizQuerySchema = yup.object({
     select: yup
@@ -14,9 +20,21 @@ const getAllFilters = yup.object({
     tags: yup.array().of(yup.string().required()).optional(),
     languages: yup.array().of(yup.string().required()).optional(),
     subject: yup.string().optional(),
-    isPrivate: yup.boolean().optional(),
-    status: yup.string().oneOf(QUIZ_STATUS).optional(),
     search: yup.string().optional(),
+    sort: yup
+        .object({
+            field: yup.string().oneOf(SORT_FIELD_OPTIONS).default('createdAt'),
+            order: yup.string().oneOf(ORDER_OPTIONS).default('desc'),
+        })
+        .optional(),
+    visibility: yup
+        .array()
+        .of(yup.string().oneOf(QUIZ_VISIBILITY).required())
+        .optional(),
+    status: yup
+        .array()
+        .of(yup.string().oneOf(QUIZ_STATUS).required())
+        .optional(),
 });
 
 export const QuizSchema = {
@@ -30,7 +48,10 @@ export const QuizSchema = {
                     .required('Subject ID is required'),
                 coverImage: yup.string().optional(),
                 tagsIds: yup.array().of(yup.string().required()).optional(),
-                languageIds: yup.array().of(yup.string().required()).optional(),
+                languagesIds: yup
+                    .array()
+                    .of(yup.string().required())
+                    .optional(),
                 shuffleAnswers: yup.boolean().default(false),
                 shuffleQuestions: yup.boolean().default(false),
             }),
@@ -123,8 +144,10 @@ export const QuizSchema = {
         }),
     }),
     copyQuiz: yup.object({
-        body: yup.object({
-            id: yup.string().length(24).required(),
-        }),
+        body: yup
+            .object({
+                id: yup.string().length(24).required(),
+            })
+            .required(),
     }),
 };

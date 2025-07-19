@@ -1,6 +1,7 @@
 import {
     AuthRequest,
     AuthResponse,
+    TeacherResponse,
     AuthControllerContract,
     PaginationType,
     PaginatedResult,
@@ -11,12 +12,14 @@ import { QuizSchema } from '../quiz.schema';
 import {
     Quiz,
     QuizAccessedTo,
-    QuizCreateInput,
+    QuizOrderBy,
     QuizSelect,
     QuizUpdateInput,
     QuizWhere,
     QuizWhereUnique,
     QuizWithSelect,
+    QuizUncheckedCreateInput,
+    SortOptions,
 } from './quiz.domain';
 
 type CommonTeacherRequest = AuthControllerContract<
@@ -26,7 +29,7 @@ type CommonTeacherRequest = AuthControllerContract<
         object,
         InferType<typeof QuizSchema.getAll>['query']
     >,
-    AuthResponse<{ data: QuizWithSelect[] | Quiz[]; meta?: PaginationData }>
+    TeacherResponse<{ data: QuizWithSelect[] | Quiz[]; meta?: PaginationData }>
 >;
 
 type GetAllServiceParams = {
@@ -40,6 +43,7 @@ type GetAllServiceParams = {
     where?: QuizWhere;
     pagination?: PaginationType;
     userId?: string;
+    sort?: SortOptions;
 };
 
 export interface IQuizController {
@@ -70,12 +74,8 @@ export interface IQuizController {
         AuthResponse<void>
     >;
     create: AuthControllerContract<
-        AuthRequest<
-            object,
-            QuizCreateInput,
-            InferType<typeof QuizSchema.create>['body']
-        >,
-        AuthResponse<QuizCreateInput>
+        AuthRequest<object, Quiz, InferType<typeof QuizSchema.create>['body']>,
+        TeacherResponse<QuizUncheckedCreateInput>
     >;
     handleTeacherQuizRequest: AuthControllerContract<
         AuthRequest<
@@ -84,7 +84,7 @@ export interface IQuizController {
             object,
             InferType<typeof QuizSchema.getAll>['query']
         >,
-        AuthResponse<{
+        TeacherResponse<{
             data: QuizWithSelect[] | Quiz[];
             meta?: PaginationData;
         }>,
@@ -126,7 +126,7 @@ export interface IQuizService {
     ) => Promise<{ data: QuizWithSelect[] | Quiz[]; meta?: PaginationData }>;
     getById: (id: string, select: QuizSelect) => Promise<QuizWithSelect>;
     delete: (id: string) => Promise<Quiz>;
-    create: (data: QuizCreateInput) => Promise<Quiz>;
+    create: (data: QuizUncheckedCreateInput) => Promise<Quiz>;
     updateFavourite: (userId: string, quizId: string) => Promise<Quiz>;
     deleteFavourite: (userId: string, quizId: string) => Promise<Quiz>;
     getAccessesToQuiz: (
@@ -147,16 +147,16 @@ export interface IQuizRepository {
         <S extends QuizSelect>(
             select?: S,
             where?: QuizWhere,
+            orderBy?: QuizOrderBy,
         ): Promise<QuizWithSelect<S>[]>;
-        (where?: QuizWhere): Promise<Quiz[]>;
+        (where?: QuizWhere, orderBy?: QuizOrderBy): Promise<Quiz[]>;
     };
-    getAllWithPagination: {
-        <S extends QuizSelect>(
-            pagination: PaginationType,
-            select?: S,
-            where?: QuizWhere,
-        ): Promise<PaginatedResult<QuizWithSelect<S>[]>>;
-    };
+    getAllWithPagination: <S extends QuizSelect>(
+        pagination: PaginationType,
+        select?: S,
+        where?: QuizWhere,
+        orderBy?: QuizOrderBy,
+    ) => Promise<PaginatedResult<QuizWithSelect<S>[]>>;
     get: {
         (where: QuizWhereUnique): Promise<Quiz>;
         <S extends QuizSelect>(
@@ -165,6 +165,6 @@ export interface IQuizRepository {
         ): Promise<QuizWithSelect<S>>;
     };
     delete: (where: QuizWhereUnique) => Promise<Quiz>;
-    create: (data: QuizCreateInput) => Promise<Quiz>;
+    create: (data: QuizUncheckedCreateInput) => Promise<Quiz>;
     update: (where: QuizWhereUnique, data: QuizUpdateInput) => Promise<Quiz>;
 }

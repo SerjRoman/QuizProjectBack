@@ -1,11 +1,12 @@
 import { isObjectEmpty } from '@utils';
 import { QuizRepository } from './quiz.repository';
-import { IQuizService } from './types/quiz.contract';
+import { IQuizService } from './types';
 import {
     QuizAccessedToSelect,
-    QuizCreateInput,
+    QuizOrderBy,
+    QuizUncheckedCreateInput,
     QuizWhere,
-} from './types/quiz.domain';
+} from './types';
 import { ForbiddenError } from '@errors';
 import { UserRepository } from '@modules/User';
 import { QUIZ_COPY_SELECT } from './constants/quiz.constants';
@@ -19,14 +20,19 @@ export const QuizService: IQuizService = {
         where,
         userId,
         pagination,
+        sort,
     }) {
         let dynamicSelect = {
             ...select,
         };
+        let orderBy: QuizOrderBy | undefined;
         const prismaWhere: QuizWhere = QuizBuilder.buildWhereFromFilters(
             where,
             filters,
         );
+        if (sort) {
+            orderBy = QuizBuilder.buildOrderByFromSort(sort);
+        }
         if (select.createdBy) {
             dynamicSelect = QuizBuilder.buildSelectWithCreatedBy(dynamicSelect);
         }
@@ -45,6 +51,7 @@ export const QuizService: IQuizService = {
                 pagination,
                 !isObjectEmpty(dynamicSelect) ? dynamicSelect : undefined,
                 prismaWhere,
+                orderBy,
             );
         } else {
             quizzes = await QuizRepository.getAllWithSelect<
@@ -52,6 +59,7 @@ export const QuizService: IQuizService = {
             >(
                 !isObjectEmpty(dynamicSelect) ? dynamicSelect : undefined,
                 prismaWhere,
+                orderBy,
             );
         }
 
@@ -67,10 +75,10 @@ export const QuizService: IQuizService = {
         );
     },
     create: async function (data) {
-        let prismaData: QuizCreateInput = { ...data };
+        let prismaData: QuizUncheckedCreateInput = { ...data };
         prismaData = QuizBuilder.buildCreateDataWithTags(data, prismaData);
         prismaData = QuizBuilder.buildCreateDataWithLanguages(data, prismaData);
-
+        console.log(prismaData)
         return await QuizRepository.create(prismaData);
     },
     delete: async function (id) {
@@ -172,10 +180,8 @@ export const QuizService: IQuizService = {
             { id: quizId },
             QUIZ_COPY_SELECT,
         );
-        const dataToCreateQuiz: QuizCreateInput = QuizBuilder.buildQuizCopyData(
-            quizToCopy,
-            teacherProfile.id,
-        );
+        const dataToCreateQuiz: QuizUncheckedCreateInput =
+            QuizBuilder.buildQuizCopyData(quizToCopy, teacherProfile.id);
         return await this.create(dataToCreateQuiz);
     },
 };

@@ -1,12 +1,16 @@
 import { InputJsonValue } from '#types';
-import { QUIZ_COPY_SELECT } from './constants/quiz.constants';
+import { QUIZ_COPY_SELECT } from './constants';
 import { QuizRepository } from './quiz.repository';
 import {
-    QuizCreateInput,
+    QuizOrderBy,
     QuizSelect,
+    QuizStatus,
+    QuizUncheckedCreateInput,
+    QuizVisibility,
     QuizWhere,
     QuizWithSelect,
-} from './types/quiz.domain';
+    SortOptions,
+} from './types';
 
 export const QuizBuilder = {
     buildWhereFromFilters: function (
@@ -17,12 +21,15 @@ export const QuizBuilder = {
                   languages?: string[];
                   subject?: string;
                   search?: string;
+                  visibility?: QuizVisibility[];
+                  status?: QuizStatus[];
               }
             | undefined,
     ) {
         const prismaWhere: QuizWhere = { ...where };
         if (filters) {
-            const { tags, languages, subject, search } = filters;
+            const { tags, languages, subject, search, visibility, status } =
+                filters;
             if (tags && tags.length > 0) {
                 prismaWhere.tags = { some: { id: { in: tags } } };
             } else {
@@ -39,8 +46,19 @@ export const QuizBuilder = {
             if (search) {
                 prismaWhere.title = { contains: search };
             }
+            if (visibility) {
+                prismaWhere.visibility = { in: visibility };
+            }
+            if (status) {
+                prismaWhere.status = { in: status };
+            }
         }
         return prismaWhere;
+    },
+    buildOrderByFromSort: function (sort: SortOptions) {
+        const orderBy: QuizOrderBy = {};
+        orderBy[sort.field] = sort.order;
+        return orderBy;
     },
     buildSelectWithFavourite: function (
         select: QuizSelect,
@@ -129,7 +147,7 @@ export const QuizBuilder = {
                 if (q.data) return true;
             })
             .map((q) => ({ type: q.type, data: q.data as InputJsonValue }));
-        const dataToCreateQuiz: QuizCreateInput = {
+        const dataToCreateQuiz: QuizUncheckedCreateInput = {
             status: 'DRAFT',
             title: `Copied ${quizToCopy.title}`,
             subjectId: quizToCopy.subjectId,
@@ -143,13 +161,15 @@ export const QuizBuilder = {
                 questionsToCopy.length > 0
                     ? { createMany: { data: questionsToCopy } }
                     : undefined,
-            createdById: teacherProfileId,
+            createdById: quizToCopy.ownedById,
+            originalQuizId: quizToCopy.id,
+            ownedById: teacherProfileId,
         };
         return dataToCreateQuiz;
     },
     buildCreateDataWithLanguages: function (
-        data: QuizCreateInput,
-        prismaData: QuizCreateInput,
+        data: QuizUncheckedCreateInput,
+        prismaData: QuizUncheckedCreateInput,
     ) {
         if (data.languagesIds && 'length' in data.languagesIds) {
             const connectLanguages = data.languagesIds.map((languageId) => ({
@@ -161,8 +181,8 @@ export const QuizBuilder = {
         return prismaData;
     },
     buildCreateDataWithTags: function (
-        data: QuizCreateInput,
-        prismaData: QuizCreateInput,
+        data: QuizUncheckedCreateInput,
+        prismaData: QuizUncheckedCreateInput,
     ) {
         if (data.tagsIds && 'length' in data.tagsIds) {
             const connectTags = data.tagsIds.map((tagId) => ({ id: tagId }));

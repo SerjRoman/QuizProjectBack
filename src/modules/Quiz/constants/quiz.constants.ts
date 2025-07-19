@@ -3,7 +3,9 @@ import {
     QuizOmit,
     QuizSelect,
     QuizStatus,
-} from '../types/quiz.domain';
+    QuizVisibility,
+    SortOptions,
+} from '../types';
 import { KeysArray } from '#types';
 
 export const QUIZ_OMIT: KeysArray<QuizOmit> = [
@@ -52,6 +54,7 @@ export const QUIZ_SELECT: KeysArray<QuizSelect> = [
     'folders',
     'questions',
     'tags',
+    'copies',
 ];
 
 export const QUIZ_INCLUDE: KeysArray<QuizInclude> = [
@@ -69,8 +72,10 @@ export const QUIZ_INCLUDE: KeysArray<QuizInclude> = [
     'tags',
 ];
 export const QUIZ_STATUS: QuizStatus[] = ['PUBLISHED', 'DRAFT'];
+export const QUIZ_VISIBILITY: QuizVisibility[] = ['PRIVATE', 'PUBLIC'];
 
-export const QUIZ_COPY_SELECT = {
+export const QUIZ_COPY_SELECT: QuizSelect = {
+    id: true,
     questions: true,
     title: true,
     subjectId: true,
@@ -80,4 +85,11 @@ export const QUIZ_COPY_SELECT = {
     shuffleQuestions: true,
     visibility: true,
     coverImage: true,
+    ownedById: true,
 };
+
+export const ORDER_OPTIONS: SortOptions['order'][] = ['desc', 'asc'];
+export const SORT_FIELD_OPTIONS: SortOptions['field'][] = [
+    'title',
+    'createdAt',
+];

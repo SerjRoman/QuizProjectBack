@@ -56,14 +56,12 @@ export const QuizRepository: IQuizRepository = {
             throw error;
         }
     },
-    getAllWithSelect: async function (select, where) {
+    getAllWithSelect: async function (select, where, orderBy) {
         try {
             return await PrismaClient.quiz.findMany({
                 where,
                 select,
-                orderBy: {
-                    createdAt: 'desc',
-                },
+                orderBy,
             });
         } catch (error) {
             if (error instanceof PrismaKnownError) {
@@ -77,15 +75,13 @@ export const QuizRepository: IQuizRepository = {
             throw error;
         }
     } as IQuizRepository['getAllWithSelect'],
-    getAllWithPagination: async function (pagination, select, where) {
+    getAllWithPagination: async function (pagination, select, where, orderBy) {
         try {
             const result = await PrismaClient.quiz
                 .paginate({
                     select,
                     where,
-                    orderBy: {
-                        createdAt: 'desc',
-                    },
+                    orderBy,
                 })
                 .withPages({
                     page: pagination.page,

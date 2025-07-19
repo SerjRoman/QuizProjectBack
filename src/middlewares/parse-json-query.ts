@@ -23,5 +23,6 @@ export const parseJsonQueryMiddleware = (
             }
         }
     }
+    console.log(req.query);
     next();
 };

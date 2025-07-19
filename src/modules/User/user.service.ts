@@ -6,6 +6,7 @@ import { AuthenticationError, ConflictError, NotFoundError } from '@errors';
 import { env } from '@config';
 import { isObjectEmpty } from '@utils';
 import { IUserService } from './types/user.contract';
+import { UserCreateInput } from './types/user.domain';
 
 export const UserService: IUserService = {
     repo: UserRepository,
@@ -18,8 +19,17 @@ export const UserService: IUserService = {
                 throw error;
             }
             const hashedPassword = await this.hashPassword(data.password);
-            data.password = hashedPassword;
-            const user = await this.repo.create(data);
+            const prismaData: UserCreateInput = {
+                ...data,
+                password: hashedPassword,
+            };
+            if (prismaData.role === 'TEACHER') {
+                prismaData.teacherProfile = { create: {} };
+            } else {
+                prismaData.studentProfile = { create: {} };
+            }
+
+            const user = await this.repo.create(prismaData);
             const token = this.generateToken(user.id);
             const refreshToken = this.generateRefreshToken(user.id);
             return { token, refreshToken };
@@ -112,3 +122,4 @@ export const UserService: IUserService = {
         return await compare(password, hashedPassword);
     },
 };
+

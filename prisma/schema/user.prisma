@@ -30,6 +30,8 @@ model TeacherProfile {
 
   createdQuizzes Quiz[] @relation(name: "CreatedQuizzesRelation")
 
+  ownedQuizzes Quiz[] @relation(name: "OwnedByQuizzesRelation")
+
   copiedQuizzes    Quiz[]   @relation(fields: [copiedQuizzesIds], references: [id], name: "CopiedQuizzesRelation")
   copiedQuizzesIds String[] @db.ObjectId
 
@@ -42,6 +44,8 @@ model TeacherProfile {
 
   accessTo Quiz[] @relation(fields: [accessToIds], references: [id],name: "AccessTeacherQuizRelation")
   accessToIds String[] @db.ObjectId 
+
+
 }
 
 model StudentProfile {
