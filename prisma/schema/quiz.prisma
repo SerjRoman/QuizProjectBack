@@ -34,9 +34,17 @@ model Quiz {
 
   createdBy   TeacherProfile @relation(fields: [createdById], references: [id], name: "CreatedQuizzesRelation")
   createdById String         @db.ObjectId
+  
+  ownedBy TeacherProfile @relation(fields: [ownedById], references: [id], name: "OwnedByQuizzesRelation")
+  ownedById String @db.ObjectId
 
   copiedBy    TeacherProfile[] @relation(fields: [copiedByIds], references: [id], name: "CopiedQuizzesRelation")
   copiedByIds String[]         @db.ObjectId
+  
+  originalQuiz Quiz? @relation(fields: [originalQuizId], references: [id], name: "QuizCopiedRelation", onDelete: NoAction, onUpdate: NoAction)
+  originalQuizId String? @db.ObjectId
+
+  copies Quiz[] @relation(name: "QuizCopiedRelation")
 
   completedBy    StudentProfile[] @relation(fields: [completedByIds], references: [id], name: "CompletedByRelation")
   completedByIds String[]         @db.ObjectId
@@ -51,4 +59,10 @@ model Quiz {
 
   accessedTo TeacherProfile[] @relation(fields: [accessedToIds], references: [id], name: "AccessTeacherQuizRelation")
   accessedToIds String[] @db.ObjectId
+
 }
+
+
+
+
+

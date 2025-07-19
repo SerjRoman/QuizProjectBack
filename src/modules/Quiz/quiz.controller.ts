@@ -1,7 +1,7 @@
 import { arrayToBooleanObject } from '@utils';
 import { QuizService } from './quiz.service';
-import type { QuizCreateInput, QuizWhere } from './types/quiz.domain';
-import type { IQuizController } from './types/quiz.contract';
+import type { QuizUncheckedCreateInput, QuizWhere } from './types';
+import type { IQuizController } from './types';
 
 export const QuizController: IQuizController = {
     handleTeacherQuizRequest: async function (
@@ -16,17 +16,22 @@ export const QuizController: IQuizController = {
             const perPage = query?.perPage ? Number(query.perPage) : undefined;
             const page = query?.page ? Number(query.page) : undefined;
             const pagination = perPage && page ? { perPage, page } : undefined;
+            const sort = query?.sort;
             const commonFilters = {
                 tags: query?.tags,
                 languages: query?.languages,
                 subject: query?.subject,
                 search: query?.search,
+                visibility: query?.visibility,
+                status: query?.status,
             };
+
             const params = {
                 select,
                 filters: commonFilters,
                 where: prismaWhereClause,
                 pagination,
+                sort,
             };
 
             const result = await QuizService.getAllTeacher(params);
@@ -46,9 +51,10 @@ export const QuizController: IQuizController = {
     },
     create: async function (req, res, next) {
         try {
-            const data: QuizCreateInput = {
+            const data: QuizUncheckedCreateInput = {
                 ...req.body,
-                createdById: res.locals.userId,
+                createdById: res.locals.teacherId,
+                ownedById: res.locals.teacherId,
             };
             res.status(201).json(await QuizService.create(data));
         } catch (error) {
@@ -67,13 +73,8 @@ export const QuizController: IQuizController = {
         const prismaWhereClause: QuizWhere = {
             OR: [
                 {
-                    copiedBy: {
-                        some: {
-                            userId: res.locals.userId,
-                        },
-                    },
+                    ownedBy: { userId: res.locals.userId },
                 },
-                { createdBy: { userId: res.locals.userId } },
                 { accessedTo: { some: { userId: res.locals.userId } } },
             ],
         };
@@ -82,15 +83,26 @@ export const QuizController: IQuizController = {
         });
     },
     teacherMyCopied: async function (req, res, next) {
-        const prismaWhereClause = {
-            copiedBy: { some: { userId: res.locals.userId } },
+        const prismaWhereClause: QuizWhere = {
+            AND: [
+                {
+                    NOT: {
+                        createdBy: { userId: res.locals.userId },
+                    },
+                },
+                {
+                    ownedBy: { userId: res.locals.userId },
+                },
+            ],
         };
         QuizController.handleTeacherQuizRequest(req, res, next, {
             prismaWhereClause,
         });
     },
     teacherMyCreated: async function (req, res, next) {
-        const prismaWhereClause = { createdBy: { userId: res.locals.userId } };
+        const prismaWhereClause: QuizWhere = {
+            createdBy: { userId: res.locals.userId },
+        };
         QuizController.handleTeacherQuizRequest(req, res, next, {
             prismaWhereClause,
         });

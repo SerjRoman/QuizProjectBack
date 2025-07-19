@@ -2,15 +2,18 @@ import {
     Prisma,
     Quiz as QuizPrisma,
     QuizStatus as QuizStatusPrisma,
+    QuizVisibility as QuizVisibilityPrisma,
 } from '#prisma/prisma';
 
 export type Quiz = QuizPrisma;
 
 export type QuizUpdateInput = Prisma.QuizUncheckedUpdateInput;
 
-export type QuizCreateInput = Prisma.QuizUncheckedCreateInput;
+export type QuizUncheckedCreateInput = Prisma.QuizUncheckedCreateInput;
+export type QuizCreateInput = Prisma.QuizCreateInput;
 
 export type QuizStatus = QuizStatusPrisma;
+export type QuizVisibility = QuizVisibilityPrisma;
 
 export type QuizInclude = Prisma.QuizInclude;
 export type QuizOmit = Prisma.QuizOmit;
@@ -50,3 +53,9 @@ export type QuizAccessedToSelect = {
 };
 
 export type QuizAccessedTo = QuizWithSelect<QuizAccessedToSelect>;
+export type QuizOrderBy = Prisma.QuizOrderByWithRelationInput;
+
+export type SortOptions = {
+    field: 'title' | 'createdAt';
+    order: 'desc' | 'asc';
+};

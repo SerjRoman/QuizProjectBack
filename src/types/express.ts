@@ -12,6 +12,10 @@ export type AuthResponse<ResBody = object> = Response<
     { userId: string }
 >;
 
+export type TeacherResponse<ResBody = object> = Response<
+    ResBody,
+    { userId: string; teacherId: string }
+>;
 export type AuthControllerContract<Req, Res, Params = void> = (
     req: Req,
     res: Res,
