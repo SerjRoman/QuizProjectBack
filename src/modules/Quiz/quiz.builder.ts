@@ -85,6 +85,7 @@ export const QuizBuilder = {
                         avatar: true,
                         firstName: true,
                         lastName: true,
+                        id: true,
                     },
                 },
             },
@@ -122,22 +123,7 @@ export const QuizBuilder = {
             },
         );
     },
-    manageAccessConnection: function (
-        userId: string,
-        quizId: string,
-        action: 'connect' | 'disconnect',
-    ) {
-        return QuizRepository.update(
-            { id: quizId },
-            {
-                accessedTo: {
-                    [action]: {
-                        userId,
-                    },
-                },
-            },
-        );
-    },
+
     buildQuizCopyData: function (
         quizToCopy: QuizWithSelect<typeof QUIZ_COPY_SELECT>,
         teacherProfileId: string,
@@ -164,6 +150,15 @@ export const QuizBuilder = {
             createdById: quizToCopy.ownedById,
             originalQuizId: quizToCopy.id,
             ownedById: teacherProfileId,
+            accesses: {
+                create: {
+                    profile: {
+                        connect: {
+                            id: teacherProfileId,
+                        },
+                    },
+                },
+            },
         };
         return dataToCreateQuiz;
     },

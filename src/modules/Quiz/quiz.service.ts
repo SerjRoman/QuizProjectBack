@@ -1,12 +1,7 @@
 import { isObjectEmpty } from '@utils';
 import { QuizRepository } from './quiz.repository';
 import { IQuizService } from './types';
-import {
-    QuizAccessedToSelect,
-    QuizOrderBy,
-    QuizUncheckedCreateInput,
-    QuizWhere,
-} from './types';
+import { QuizOrderBy, QuizUncheckedCreateInput, QuizWhere } from './types';
 import { ForbiddenError } from '@errors';
 import { UserRepository } from '@modules/User';
 import { QUIZ_COPY_SELECT } from './constants/quiz.constants';
@@ -78,7 +73,16 @@ export const QuizService: IQuizService = {
         let prismaData: QuizUncheckedCreateInput = { ...data };
         prismaData = QuizBuilder.buildCreateDataWithTags(data, prismaData);
         prismaData = QuizBuilder.buildCreateDataWithLanguages(data, prismaData);
-        console.log(prismaData)
+        prismaData.accesses = {
+            create: {
+                profile: {
+                    connect: {
+                        id: data.createdById,
+                    },
+                },
+                accessType: 'CREATOR',
+            },
+        };
         return await QuizRepository.create(prismaData);
     },
     delete: async function (id) {
@@ -98,74 +102,7 @@ export const QuizService: IQuizService = {
             'disconnect',
         );
     },
-    getAccessesToQuiz: async function (userId, quizId) {
-        const accesses = await QuizRepository.get<QuizAccessedToSelect>(
-            { id: quizId },
-            {
-                accessedTo: {
-                    select: {
-                        user: {
-                            select: {
-                                id: true,
-                                firstName: true,
-                                lastName: true,
-                            },
-                        },
-                    },
-                },
-                createdById: true,
-            },
-        );
-        if (userId != accesses.createdById) {
-            throw new ForbiddenError(
-                'You cannot get access of a quiz that you did not create',
-            );
-        }
-        return accesses;
-    },
-    updateAccess: async function (ownerId, quizId, username) {
-        const quiz = await QuizRepository.get<{
-            createdBy: { select: { userId: true } };
-        }>(
-            { id: quizId },
-            {
-                createdBy: { select: { userId: true } },
-            },
-        );
-        if (quiz.createdBy.userId !== ownerId) {
-            throw new ForbiddenError(
-                'You cannot get access of a quiz that you did not create',
-            );
-        }
-        const userToGiveAccess = await UserRepository.get(
-            { username },
-            { id: true },
-        );
-        return await QuizBuilder.manageAccessConnection(
-            userToGiveAccess.id,
-            quizId,
-            'connect',
-        );
-    },
-    deleteAccess: async function (userId, quizId, userToGiveAccessId) {
-        const quiz = await QuizRepository.get<{ createdById: true }>(
-            {
-                id: quizId,
-                accessedTo: { some: { userId: userToGiveAccessId } },
-            },
-            { createdById: true },
-        );
-        if (quiz.createdById != userId) {
-            throw new ForbiddenError(
-                'You cannot get access of a quiz that you did not create',
-            );
-        }
-        return await QuizBuilder.manageAccessConnection(
-            userToGiveAccessId,
-            quizId,
-            'disconnect',
-        );
-    },
+    // !FIX - use teacherId instead of userId
     copyQuiz: async function (userId, quizId) {
         const { teacherProfile } = await UserRepository.get(
             { id: userId },

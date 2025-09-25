@@ -38,21 +38,26 @@ export type QuizWithSelect<S extends QuizSelect = object> =
     Prisma.QuizGetPayload<{ select: S }>;
 
 export type QuizAccessedToSelect = {
-    accessedTo: {
-        select: {
-            user: {
+    accesses: {
+        include: {
+            profile: {
                 select: {
-                    id: true;
-                    firstName: true;
-                    lastName: true;
+                    user: {
+                        select: {
+                            firstName: true;
+                            lastName: true;
+                            id: true;
+                            avatar: true;
+                        };
+                    };
                 };
             };
         };
     };
-    createdById: true;
+    ownedById: true;
 };
 
-export type QuizAccessedTo = QuizWithSelect<QuizAccessedToSelect>;
+export type QuizAccesses = QuizWithSelect<QuizAccessedToSelect>;
 export type QuizOrderBy = Prisma.QuizOrderByWithRelationInput;
 
 export type SortOptions = {

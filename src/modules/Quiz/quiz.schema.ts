@@ -44,7 +44,7 @@ export const QuizSchema = {
                 title: yup.string().min(3).required('Title is required'),
                 subjectId: yup
                     .string()
-                    .length(24)
+                    .length(25)
                     .required('Subject ID is required'),
                 coverImage: yup.string().optional(),
                 tagsIds: yup.array().of(yup.string().required()).optional(),
@@ -54,6 +54,7 @@ export const QuizSchema = {
                     .optional(),
                 shuffleAnswers: yup.boolean().default(false),
                 shuffleQuestions: yup.boolean().default(false),
+                visibility: yup.string().oneOf(QUIZ_VISIBILITY),
             }),
         })
         .required(),
@@ -110,27 +111,7 @@ export const QuizSchema = {
             id: yup.string().length(24).required(),
         }),
     }),
-    getAccessesToQuiz: yup.object({
-        params: yup.object({
-            id: yup.string().length(24).required(),
-        }),
-    }),
-    updateAccess: yup.object({
-        params: yup.object({
-            id: yup.string().length(24).required(),
-        }),
-        body: yup.object({
-            username: yup.string().required(),
-        }),
-    }),
-    deleteAccess: yup.object({
-        params: yup.object({
-            id: yup.string().length(24).required(),
-        }),
-        body: yup.object({
-            userId: yup.string().length(24).required(),
-        }),
-    }),
+
     patch: yup.object({
         params: yup.object({
             id: yup.string().length(24).required(),

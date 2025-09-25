@@ -42,10 +42,7 @@ model TeacherProfile {
 
   classrooms Classroom[] @relation(name: "ClassroomTeacherRelation")
 
-  accessTo Quiz[] @relation(fields: [accessToIds], references: [id],name: "AccessTeacherQuizRelation")
-  accessToIds String[] @db.ObjectId 
-
-
+  accesses QuizAccess[] @relation(name: "QuizAccessProfile")
 }
 
 model StudentProfile {

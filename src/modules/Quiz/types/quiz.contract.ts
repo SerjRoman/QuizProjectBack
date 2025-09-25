@@ -1,6 +1,5 @@
 import {
     AuthRequest,
-    AuthResponse,
     TeacherResponse,
     AuthControllerContract,
     PaginationType,
@@ -11,7 +10,6 @@ import { InferType } from 'yup';
 import { QuizSchema } from '../quiz.schema';
 import {
     Quiz,
-    QuizAccessedTo,
     QuizOrderBy,
     QuizSelect,
     QuizUpdateInput,
@@ -22,15 +20,18 @@ import {
     SortOptions,
 } from './quiz.domain';
 
-type CommonTeacherRequest = AuthControllerContract<
-    AuthRequest<
+type CommonTeacherRequest = (
+    req: AuthRequest<
         object,
         object,
         object,
         InferType<typeof QuizSchema.getAll>['query']
     >,
-    TeacherResponse<{ data: QuizWithSelect[] | Quiz[]; meta?: PaginationData }>
->;
+    res: TeacherResponse<{
+        data: QuizWithSelect[] | Quiz[];
+        meta?: PaginationData;
+    }>,
+) => void;
 
 type GetAllServiceParams = {
     select: QuizSelect;
@@ -58,7 +59,7 @@ export interface IQuizController {
             object,
             InferType<typeof QuizSchema.copyQuiz>['body']
         >,
-        AuthResponse<Quiz>
+        TeacherResponse<Quiz>
     >;
     getById: AuthControllerContract<
         AuthRequest<
@@ -67,56 +68,36 @@ export interface IQuizController {
             object,
             InferType<typeof QuizSchema.getById>['query']
         >,
-        AuthResponse<QuizWithSelect | Quiz>
+        TeacherResponse<QuizWithSelect | Quiz>
     >;
     delete: AuthControllerContract<
         AuthRequest<InferType<typeof QuizSchema.delete>>['params'],
-        AuthResponse<void>
+        TeacherResponse<void>
     >;
     create: AuthControllerContract<
         AuthRequest<object, Quiz, InferType<typeof QuizSchema.create>['body']>,
         TeacherResponse<QuizUncheckedCreateInput>
     >;
-    handleTeacherQuizRequest: AuthControllerContract<
-        AuthRequest<
+    handleTeacherQuizRequest: (
+        req: AuthRequest<
             object,
             object,
             object,
             InferType<typeof QuizSchema.getAll>['query']
         >,
-        TeacherResponse<{
+        res: TeacherResponse<{
             data: QuizWithSelect[] | Quiz[];
             meta?: PaginationData;
         }>,
-        { prismaWhereClause: QuizWhere }
-    >;
+        prismaWhereClause: QuizWhere,
+    ) => void;
     addToFavourites: AuthControllerContract<
         AuthRequest<InferType<typeof QuizSchema.updateFavourite>['params']>,
-        AuthResponse<void>
+        TeacherResponse<void>
     >;
     removeFromFavourites: AuthControllerContract<
         AuthRequest<InferType<typeof QuizSchema.deleteFavourite>['params']>,
-        AuthResponse<void>
-    >;
-    getAccessesToQuiz: AuthControllerContract<
-        AuthRequest<InferType<typeof QuizSchema.getAccessesToQuiz>['params']>,
-        AuthResponse<QuizAccessedTo>
-    >;
-    giveAccessToQuiz: AuthControllerContract<
-        AuthRequest<
-            InferType<typeof QuizSchema.updateAccess>['params'],
-            object,
-            InferType<typeof QuizSchema.updateAccess>['body']
-        >,
-        AuthResponse<void>
-    >;
-    removeAccessToQuiz: AuthControllerContract<
-        AuthRequest<
-            InferType<typeof QuizSchema.deleteAccess>['params'],
-            object,
-            InferType<typeof QuizSchema.deleteAccess>['body']
-        >,
-        AuthResponse<void>
+        TeacherResponse<void>
     >;
 }
 
@@ -129,16 +110,6 @@ export interface IQuizService {
     create: (data: QuizUncheckedCreateInput) => Promise<Quiz>;
     updateFavourite: (userId: string, quizId: string) => Promise<Quiz>;
     deleteFavourite: (userId: string, quizId: string) => Promise<Quiz>;
-    getAccessesToQuiz: (
-        userId: string,
-        quizId: string,
-    ) => Promise<QuizAccessedTo>;
-    updateAccess: (
-        userId: string,
-        quizId: string,
-        username: string,
-    ) => Promise<Quiz>;
-    deleteAccess: (userId: string, quizId: string, id: string) => Promise<Quiz>;
     copyQuiz: (userId: string, quizId: string) => Promise<Quiz>;
 }
 

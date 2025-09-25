@@ -57,9 +57,7 @@ model Quiz {
 
   rooms Room[] @relation(name: "QuizRoomRelation")
 
-  accessedTo TeacherProfile[] @relation(fields: [accessedToIds], references: [id], name: "AccessTeacherQuizRelation")
-  accessedToIds String[] @db.ObjectId
-
+  accesses QuizAccess[] @relation(name: "QuizAccessQuiz")
 }
 
 

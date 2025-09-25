@@ -1,0 +1,19 @@
+enum QuizAccessType {
+    CREATOR
+    VIEWER
+    EDITOR
+}
+
+
+model QuizAccess {
+    id String @id @default(auto()) @db.ObjectId @map("_id")
+    accessType QuizAccessType @default(VIEWER)
+
+    profile TeacherProfile @relation(fields: [profileId], references: [id], name: "QuizAccessProfile")
+    profileId String @db.ObjectId
+
+    quiz Quiz @relation(fields: [quizId], references: [id], name: "QuizAccessQuiz")
+    quizId String @db.ObjectId
+
+    @@unique([quizId, profileId])
+}

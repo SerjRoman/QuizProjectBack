@@ -93,3 +93,7 @@ export const SORT_FIELD_OPTIONS: SortOptions['field'][] = [
     'title',
     'createdAt',
 ];
+
+export const GET_TEACHER_PROFILE_SELECT = {
+    ownedBy: { select: { userId: true } },
+};
