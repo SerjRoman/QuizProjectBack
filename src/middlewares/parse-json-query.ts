@@ -5,6 +5,11 @@ export const parseJsonQueryMiddleware = (
     _: Response,
     next: NextFunction,
 ) => {
+    Object.defineProperty(req, 'query', {
+        ...Object.getOwnPropertyDescriptor(req, 'query'),
+        value: req.query,
+        writable: true,
+    });
     for (const key in req.query) {
         const value = req.query[key];
 
@@ -14,15 +19,9 @@ export const parseJsonQueryMiddleware = (
             }
 
             if (value.startsWith('[') || value.startsWith('{')) {
-                try {
-                    req.query[key] = JSON.parse(value);
-                } catch (error) {
-                    console.error(error);
-                    next(error);
-                }
+                req.query[key] = JSON.parse(value);
             }
         }
     }
-    console.log(req.query);
     next();
 };
