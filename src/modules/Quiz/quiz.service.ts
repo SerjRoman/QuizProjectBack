@@ -80,7 +80,7 @@ export const QuizService: IQuizService = {
                         id: data.createdById,
                     },
                 },
-                accessType: 'CREATOR',
+                accessType: 'OWNER',
             },
         };
         return await QuizRepository.create(prismaData);

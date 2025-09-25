@@ -16,12 +16,7 @@ export const validateMiddleware = (schema: AnySchema) =>
                     stripUnknown: true,
                 },
             );
-            for (const key in req.query) {
-                delete req.query[key];
-            }
-            if (validated.query) {
-                Object.assign(req.query, validated.query);
-            }
+            req.query = validated.query;
             req.body = validated.body;
 
             return next();
