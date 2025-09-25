@@ -19,9 +19,10 @@ router.get(
 );
 router.post(
     '/',
-    validateMiddleware(QuizSchema.create),
+    authenticateMiddleware,
     checkRole('TEACHER'),
     authenticateTeacherMiddleware,
+    validateMiddleware(QuizSchema.create),
     QuizController.create,
 );
 
@@ -71,11 +72,15 @@ router.delete(
 );
 router.delete(
     '/:id',
+    authenticateMiddleware,
+    checkRole('TEACHER'),
+    authenticateTeacherMiddleware,
     validateMiddleware(QuizSchema.delete),
     QuizController.delete,
 );
 router.post(
     '/teacher/copy',
+    authenticateMiddleware,
     checkRole('TEACHER'),
     authenticateTeacherMiddleware,
     validateMiddleware(QuizSchema.copyQuiz),
