@@ -1,7 +1,9 @@
 import { TeacherResponse } from '#types';
+import { env } from '@config';
 import { AuthenticationError, ForbiddenError } from '@errors';
-import { UserRepository, UserService } from '@modules/User';
+import { UserRepository } from '@modules/User';
 import { NextFunction, Request, Response } from 'express';
+import { TokenExpiredError, verify } from 'jsonwebtoken';
 
 export const authenticateMiddleware = (
     req: Request,
@@ -28,11 +30,14 @@ export const authenticateMiddleware = (
         return;
     }
     try {
-        const userId = UserService.verifyToken(token);
-        res.locals.userId = userId;
+        const decoded = verify(token, env.SECRET_KEY);
+        res.locals.userId = (decoded as { userId: string }).userId;
         next();
     } catch (error) {
-        next(error);
+        if (error instanceof TokenExpiredError) {
+            throw new AuthenticationError('token expired', 'token_expired');
+        }
+        throw new AuthenticationError('Invalid token', 'token_verification');
     }
 };
 export const authenticateTeacherMiddleware = async (
@@ -43,12 +48,12 @@ export const authenticateTeacherMiddleware = async (
     try {
         const teacherId = await UserRepository.get<{
             teacherProfile: { select: { id: true } };
-        }>(
-            { id: res.locals.userId },
-            {
+        }>({
+            where: { id: res.locals.userId },
+            select: {
                 teacherProfile: { select: { id: true } },
             },
-        );
+        });
         if (!teacherId.teacherProfile) {
             next(new ForbiddenError('you are not a teacher'));
             return;

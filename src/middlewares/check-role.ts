@@ -6,12 +6,12 @@ import { NextFunction } from 'express';
 export function checkRole(role: string) {
     return async (_: AuthRequest, res: AuthResponse, next: NextFunction) => {
         try {
-            const user = await UserRepository.get<{ role: true }>(
-                { id: res.locals.userId },
-                {
+            const user = await UserRepository.get<{ role: true }>({
+                where: { id: res.locals.userId },
+                select: {
                     role: true,
                 },
-            );
+            });
             if (user.role === role) {
                 next();
             } else {

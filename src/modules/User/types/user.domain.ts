@@ -25,3 +25,6 @@ export type UserWithSelect<S extends UserSelect = object> =
     Prisma.UserGetPayload<{ select: S }>;
 
 export type UserWhereUnique = Prisma.UserWhereUniqueInput;
+export type UserWithInclude<I extends UserInclude = object> =
+    Prisma.UserGetPayload<{ include: I }>;
+export type UserFindUniqueArgs = Prisma.UserFindUniqueArgs;

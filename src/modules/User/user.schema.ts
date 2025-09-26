@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import { USER_SELECT } from './user.constants';
+import { USER_SELECT } from './constants';
 
 const commonQueries = yup.object({
     select: yup
@@ -37,16 +37,5 @@ export const UserSchema = {
     }),
     getById: yup.object({
         query: commonQueries.optional(),
-    }),
-    refresh: yup.object({
-        body: yup.object({
-            refreshToken: yup.string().required(),
-        }),
-    }),
-    login: yup.object({
-        body: yup.object({
-            email: yup.string().required(),
-            password: yup.string().required(),
-        }),
     }),
 };
