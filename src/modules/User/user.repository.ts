@@ -1,83 +1,41 @@
+import { ConflictError, NotFoundError, PrismaErrors } from '@errors';
+import { handlePrismaError } from '@utils';
 import { PrismaClient } from '@prisma';
-import { PrismaKnownError } from '#types';
-import { NotFoundError, PrismaErrors } from '@errors';
-import { IUserRepository } from './types/user.contract';
+import { UserFindUniqueArgs, UserRepositoryContract } from './types';
 
-export const UserRepository: IUserRepository = {
-    get: async function (where, select) {
-        try {
-            if (select) {
-                return await PrismaClient.user.findUniqueOrThrow({
-                    where,
-                    select,
-                });
-            }
-            return await PrismaClient.user.findUniqueOrThrow({
-                where,
-                omit: { password: true },
-            });
-        } catch (error) {
-            if (error instanceof PrismaKnownError) {
-                switch (error.code) {
-                    case PrismaErrors.NOT_FOUND:
-                        throw new NotFoundError('User');
-                    default:
-                        throw error;
-                }
-            }
-            throw error;
-        }
-    } as IUserRepository['get'],
-    create: async function (data) {
-        try {
-            return await PrismaClient.user.create({
-                data,
-            });
-        } catch (error) {
-            if (error instanceof PrismaKnownError) {
-                switch (error.code) {
-                    case PrismaErrors.CONFLICT:
-                        throw new NotFoundError('User');
-                    default:
-                        throw error;
-                }
-            }
-            throw error;
-        }
+export const UserRepository: UserRepositoryContract = {
+    async create(data) {
+        return handlePrismaError(PrismaClient.user.create({ data }), {
+            [PrismaErrors.CONFLICT]: new ConflictError('User already exists'),
+        });
     },
-    update: async function (where, data) {
-        try {
-            return await PrismaClient.user.update({
-                where,
-                data,
-            });
-        } catch (error) {
-            if (error instanceof PrismaKnownError) {
-                switch (error.code) {
-                    case PrismaErrors.NOT_FOUND:
-                        throw new NotFoundError('User');
-                    default:
-                        throw error;
-                }
-            }
-            throw error;
-        }
+
+    async update(where, data) {
+        const userPromise = PrismaClient.user.update({
+            where,
+            data,
+        });
+        return handlePrismaError(userPromise, {
+            [PrismaErrors.NOT_FOUND]: new NotFoundError('User'),
+        });
     },
-    delete: async function (where) {
-        try {
-            return await PrismaClient.user.delete({
-                where,
-            });
-        } catch (error) {
-            if (error instanceof PrismaKnownError) {
-                switch (error.code) {
-                    case PrismaErrors.NOT_FOUND:
-                        throw new NotFoundError('User');
-                    default:
-                        throw error;
-                }
-            }
-            throw error;
-        }
+
+    async delete(where) {
+        const userPromise = PrismaClient.user.delete({
+            where,
+        });
+        return handlePrismaError(userPromise, {
+            [PrismaErrors.NOT_FOUND]: new NotFoundError('User'),
+        });
     },
+
+    get: async function (params: UserFindUniqueArgs) {
+        const finalParams = { ...params };
+
+        const userPromise = PrismaClient.user.findUniqueOrThrow(finalParams);
+
+        return handlePrismaError(userPromise, {
+            [PrismaErrors.NOT_FOUND]: new NotFoundError('User'),
+        });
+    } as UserRepositoryContract['get'],
 };

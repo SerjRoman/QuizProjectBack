@@ -1,29 +1,32 @@
-import { Request, Response, NextFunction } from 'express';
 import {
-    User,
     UserCreateInput,
-    UserLoginPayload,
+    UserInclude,
     UserSelect,
     UserUpdateInput,
     UserWhereUnique,
-    UserWithArgs,
+    UserWithInclude,
     UserWithoutPassword,
     UserWithSelect,
 } from './user.domain';
 import { InferType } from 'yup';
 import { UserSchema } from '../user.schema';
 import { AuthRequest, AuthResponse } from '#types';
+import {
+    GetUserByIdDto,
+    CreateUserDto,
+    UpdateUserDto,
+    DeleteUserDto,
+} from './user.dto';
 
-export interface IUserController {
+export interface UserControllerContract {
     create: (
-        req: Request<
+        req: AuthRequest<
             object,
-            User,
+            UserWithoutPassword,
             InferType<typeof UserSchema.create>['body'],
             object
         >,
-        res: Response<User>,
-        next: NextFunction,
+        res: AuthResponse<UserWithoutPassword>,
     ) => void;
     getById: (
         req: AuthRequest<
@@ -32,103 +35,49 @@ export interface IUserController {
             object,
             InferType<typeof UserSchema.getById>['query']
         >,
-        res: Response<UserWithoutPassword | UserWithSelect | null>,
-        next: NextFunction,
+        res: AuthResponse<UserWithoutPassword | UserWithSelect | null>,
     ) => void;
     update: (
         req: AuthRequest<
             { id: string },
-            UserUpdateInput,
+            UserWithoutPassword,
             InferType<typeof UserSchema.update>['body'],
             object
         >,
-        res: Response<User>,
-        next: NextFunction,
+        res: AuthResponse<UserWithoutPassword>,
     ) => void;
     delete: (
-        req: AuthRequest<{ id: string }, void, object, object>,
-        res: Response<User>,
-        next: NextFunction,
-    ) => void;
-    me: (
-        req: AuthRequest<
-            object,
-            UserWithArgs | null,
-            object,
-            InferType<typeof UserSchema.getById>['query']
-        >,
-        res: AuthResponse<UserWithSelect | Omit<User, 'password'> | null>,
-        next: NextFunction,
-    ) => void;
-    refresh: (
-        req: Request<
-            object,
-            { token: string },
-            InferType<typeof UserSchema.refresh>['body'],
-            object
-        >,
-        res: Response<{ token: string }>,
-        next: NextFunction,
-    ) => void;
-    logout: (req: AuthRequest, res: AuthResponse, next: NextFunction) => void;
-    register: (
-        req: Request<
-            object,
-            { token: string; refreshToken: string },
-            InferType<typeof UserSchema.create>['body'],
-            object
-        >,
-        res: Response<{ token: string; refreshToken: string }>,
-        next: NextFunction,
-    ) => void;
-    login: (
-        req: Request<
-            object,
-            User,
-            InferType<typeof UserSchema.login>['body'],
-            object
-        >,
-        res: Response<{ token: string; refreshToken: string }>,
-        next: NextFunction,
+        req: AuthRequest<{ id: string }, UserWithoutPassword, object, object>,
+        res: AuthResponse<UserWithoutPassword>,
     ) => void;
 }
 
-export interface IUserService {
-    repo: IUserRepository;
-    create: (data: UserCreateInput) => Promise<User>;
-    register: (
-        data: UserCreateInput,
-    ) => Promise<{ token: string; refreshToken: string }>;
-    login: (
-        data: UserLoginPayload,
-    ) => Promise<{ token: string; refreshToken: string }>;
-    getById: <S extends UserSelect>(
-        id: string,
-        select: UserSelect,
-    ) => Promise<UserWithoutPassword | UserWithSelect<S>>;
-    update: (id: string, data: UserUpdateInput) => Promise<User>;
-    delete: (id: string) => Promise<User>;
-    hashPassword: (password: string) => Promise<string>;
-    comparePasswords: (
-        hashedPassword: string,
-        password: string,
-    ) => Promise<boolean>;
-    generateToken: (userId: string) => string;
-    generateRefreshToken: (userId: string) => string;
-    verifyRefreshToken: (refreshToken: string) => string;
-    verifyToken: (token: string) => string;
-    refresh: (refreshToken: string) => string;
+export interface UserServiceContract {
+    getById: (
+        dto: GetUserByIdDto,
+    ) => Promise<UserWithoutPassword | UserWithSelect<UserSelect>>;
+    create: (dto: CreateUserDto) => Promise<UserWithoutPassword>;
+    update: (dto: UpdateUserDto) => Promise<UserWithoutPassword>;
+    delete: (dto: DeleteUserDto) => Promise<UserWithoutPassword>;
 }
 
-export interface IUserRepository {
-    create: (data: UserCreateInput) => Promise<User>;
+export interface UserRepositoryContract {
+    create: (data: UserCreateInput) => Promise<UserWithoutPassword>;
+    update: (
+        where: UserWhereUnique,
+        data: UserUpdateInput,
+    ) => Promise<UserWithoutPassword>;
+    delete: (where: UserWhereUnique) => Promise<UserWithoutPassword>;
+
     get: {
-        (where: UserWhereUnique): Promise<UserWithoutPassword>;
-        <S extends UserSelect>(
-            where: UserWhereUnique,
-            select?: S,
-        ): Promise<UserWithSelect<S>>;
+        (params: { where: UserWhereUnique }): Promise<UserWithoutPassword>;
+        <S extends UserSelect>(params: {
+            where: UserWhereUnique;
+            select?: S;
+        }): Promise<UserWithSelect<S>>;
+        <I extends UserInclude>(params: {
+            where: UserWhereUnique;
+            include?: I;
+        }): Promise<UserWithInclude<I>>;
     };
-    update: (where: UserWhereUnique, data: UserUpdateInput) => Promise<User>;
-    delete: (where: UserWhereUnique) => Promise<User>;
 }

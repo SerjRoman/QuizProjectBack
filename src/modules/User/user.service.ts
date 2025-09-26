@@ -1,125 +1,32 @@
-import { compare, hash } from 'bcryptjs';
+import { hash } from 'bcryptjs';
 import { UserRepository } from './user.repository';
-import { sign, TokenExpiredError, verify } from 'jsonwebtoken';
-import { StringValue } from 'ms';
-import { AuthenticationError, ConflictError, NotFoundError } from '@errors';
-import { env } from '@config';
+import { UserServiceContract } from './types';
+import { ConflictError } from '@errors';
 import { isObjectEmpty } from '@utils';
-import { IUserService } from './types/user.contract';
-import { UserCreateInput } from './types/user.domain';
 
-export const UserService: IUserService = {
-    repo: UserRepository,
-    register: async function (data) {
-        try {
-            await this.repo.get({ email: data.email });
-            throw new ConflictError('User already exists with this ID');
-        } catch (error) {
-            if (!(error instanceof NotFoundError)) {
-                throw error;
-            }
-            const hashedPassword = await this.hashPassword(data.password);
-            const prismaData: UserCreateInput = {
-                ...data,
-                password: hashedPassword,
-            };
-            if (prismaData.role === 'TEACHER') {
-                prismaData.teacherProfile = { create: {} };
-            } else {
-                prismaData.studentProfile = { create: {} };
-            }
-
-            const user = await this.repo.create(prismaData);
-            const token = this.generateToken(user.id);
-            const refreshToken = this.generateRefreshToken(user.id);
-            return { token, refreshToken };
-        }
-    },
-    login: async function (data) {
-        const user = await this.repo.get<{ password: true; id: true }>(
-            { email: data.email },
-            { password: true, id: true },
-        );
-        const isMatch = await this.comparePasswords(
-            user.password,
-            data.password,
-        );
-        if (!isMatch) {
-            throw new AuthenticationError('Wrong credentials', 'credentials');
-        }
-        const token = this.generateToken(user.id);
-        const refreshToken = this.generateRefreshToken(user.id);
-        return { token, refreshToken };
-    },
+export const UserService: UserServiceContract = {
     create: async function (data) {
-        const existingUser = await this.repo.get({ email: data.email });
+        const existingUser = await UserRepository.get({
+            where: { email: data.email },
+        });
         if (existingUser) {
             throw new ConflictError('User already exists with this ID');
         }
-        const hashedPassword = await this.hashPassword(data.password);
+        const hashedPassword = await hash(data.password, 10);
         data.password = hashedPassword;
-        return await this.repo.create(data);
+        return await UserRepository.create(data);
     },
 
-    getById: async function (id, select) {
-        return await this.repo.get<typeof select>(
-            { id },
-            !isObjectEmpty(select) ? select : undefined,
-        );
+    getById: async function ({ id, select }) {
+        return await UserRepository.get<typeof select>({
+            where: { id },
+            select: !isObjectEmpty(select) ? select : undefined,
+        });
     },
-    update: async function (id, data) {
-        return await this.repo.update({ id }, data);
+    update: async function ({ id, data }) {
+        return await UserRepository.update({ id }, data);
     },
     delete: async function (id) {
-        return await this.repo.delete({ id });
-    },
-    hashPassword: async function (password) {
-        return await hash(password, 10);
-    },
-    generateToken: function (userId) {
-        return sign({ userId }, env.SECRET_KEY, {
-            expiresIn: env.JWT_EXPIRES_IN as StringValue,
-        });
-    },
-    generateRefreshToken: function (userId) {
-        return sign({ userId }, env.REFRESH_SECRET_KEY, {
-            expiresIn: env.REFRESH_JWT_EXPIRES_IN as StringValue,
-        });
-    },
-    refresh: function (refreshToken) {
-        const userId = this.verifyRefreshToken(refreshToken);
-        return this.generateToken(userId);
-    },
-    verifyRefreshToken: function (refreshToken) {
-        try {
-            const decoded = verify(refreshToken, env.REFRESH_SECRET_KEY);
-            return (decoded as { userId: string }).userId;
-        } catch (error) {
-            if (error instanceof TokenExpiredError) {
-                throw new AuthenticationError('token expired', 'token_expired');
-            }
-            throw new AuthenticationError(
-                'Invalid refresh token',
-                'refresh_token_verification',
-            );
-        }
-    },
-    verifyToken: function (token) {
-        try {
-            const decoded = verify(token, env.SECRET_KEY);
-            return (decoded as { userId: string }).userId;
-        } catch (error) {
-            if (error instanceof TokenExpiredError) {
-                throw new AuthenticationError('token expired', 'token_expired');
-            }
-            throw new AuthenticationError(
-                'Invalid token',
-                'token_verification',
-            );
-        }
-    },
-    comparePasswords: async function (hashedPassword, password) {
-        return await compare(password, hashedPassword);
+        return await UserRepository.delete(id);
     },
 };
-

@@ -5,35 +5,13 @@ import { authenticateMiddleware, validateMiddleware } from '@middlewares';
 
 const router = Router();
 
+router.use(authenticateMiddleware);
+
 router.post(
     '/create',
     validateMiddleware(UserSchema.create),
     UserController.create,
 );
-
-router.get(
-    '/me',
-    authenticateMiddleware,
-    validateMiddleware(UserSchema.getById),
-    UserController.me,
-);
-router.post(
-    '/refresh',
-    validateMiddleware(UserSchema.refresh),
-    UserController.refresh,
-);
-router.get('/logout', authenticateMiddleware, UserController.logout);
-router.post(
-    '/register',
-    validateMiddleware(UserSchema.create),
-    UserController.register,
-);
-router.post(
-    '/login',
-    validateMiddleware(UserSchema.login),
-    UserController.login,
-);
-
 router.get(
     '/:id',
     validateMiddleware(UserSchema.getById),

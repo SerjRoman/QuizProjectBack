@@ -4,4 +4,4 @@ export { UserRepository } from './user.repository';
 export { UserSchema } from './user.schema';
 export { UserService } from './user.service';
 
-export * from './types/user.domain';
+export * from './types';
