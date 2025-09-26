@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { PrismaKnownError } from '#types';
 import { PrismaErrors } from '@errors';
 
 type ErrorMap = {
@@ -12,7 +12,7 @@ export async function handlePrismaError<T>(
     try {
         return await prismaPromise;
     } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error instanceof PrismaKnownError) {
             const customError = errorMap[error.code as PrismaErrors];
             if (customError) {
                 throw customError;
