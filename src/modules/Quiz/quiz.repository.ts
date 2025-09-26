@@ -1,126 +1,66 @@
-import { PrismaKnownError } from '#types';
+import { PaginationParams } from '#types';
+import {
+    QuizFindManyArgs,
+    QuizFindUniqueArgs,
+    QuizRepositoryContract,
+} from './types';
 import { ConflictError, NotFoundError, PrismaErrors } from '@errors';
 import { PrismaClient } from '@prisma';
-import { IQuizRepository } from './types/quiz.contract';
+import { handlePrismaError } from '@utils';
 
-export const QuizRepository: IQuizRepository = {
-    get: async function (where, select) {
-        try {
-            return await PrismaClient.quiz.findUniqueOrThrow({
-                where,
-                select,
-            });
-        } catch (error) {
-            if (error instanceof PrismaKnownError) {
-                switch (error.code) {
-                    case PrismaErrors.NOT_FOUND:
-                        throw new NotFoundError('Quiz');
-                    default:
-                        throw error;
-                }
-            }
-            throw error;
-        }
-    } as IQuizRepository['get'],
-    create: async function (data) {
-        try {
-            return await PrismaClient.quiz.create({
-                data,
-            });
-        } catch (error) {
-            if (error instanceof PrismaKnownError) {
-                switch (error.code) {
-                    case PrismaErrors.CONFLICT:
-                        throw new ConflictError();
-                    default:
-                        throw error;
-                }
-            }
-            throw error;
-        }
+export const QuizRepository: QuizRepositoryContract = {
+    async create(data) {
+        return handlePrismaError(PrismaClient.quiz.create({ data }), {
+            [PrismaErrors.CONFLICT]: new ConflictError(),
+        });
     },
-    delete: async function (where) {
-        try {
-            return await PrismaClient.quiz.delete({
-                where,
-            });
-        } catch (error) {
-            if (error instanceof PrismaKnownError) {
-                switch (error.code) {
-                    case PrismaErrors.NOT_FOUND:
-                        throw new NotFoundError('Quiz');
-                    default:
-                        throw error;
-                }
-            }
-            throw error;
-        }
+
+    async delete(where) {
+        return handlePrismaError(PrismaClient.quiz.delete({ where }), {
+            [PrismaErrors.NOT_FOUND]: new NotFoundError('Quiz'),
+        });
     },
-    getAllWithSelect: async function (select, where, orderBy) {
-        try {
-            return await PrismaClient.quiz.findMany({
-                where,
-                select,
-                orderBy,
-            });
-        } catch (error) {
-            if (error instanceof PrismaKnownError) {
-                switch (error.code) {
-                    case PrismaErrors.NOT_FOUND:
-                        throw new NotFoundError('Quiz');
-                    default:
-                        throw error;
-                }
-            }
-            throw error;
-        }
-    } as IQuizRepository['getAllWithSelect'],
-    getAllWithPagination: async function (pagination, select, where, orderBy) {
-        try {
-            const result = await PrismaClient.quiz
-                .paginate({
-                    select,
-                    where,
-                    orderBy,
-                })
-                .withPages({
-                    page: pagination.page,
-                    limit: pagination.perPage,
-                });
-            return [result[0], result[1]];
-        } catch (error) {
-            if (error instanceof PrismaKnownError) {
-                switch (error.code) {
-                    case PrismaErrors.NOT_FOUND:
-                        throw new NotFoundError('Quiz');
-                    default:
-                        throw error;
-                }
-            }
-            throw error;
-        }
-    } as IQuizRepository['getAllWithPagination'],
-    update: async function (where, data) {
-        try {
-            return await PrismaClient.quiz.update({
+
+    async update(where, data) {
+        return handlePrismaError(
+            PrismaClient.quiz.update({
                 where,
                 data: {
                     ...data,
                     updatedAt: new Date(),
                 },
-            });
-        } catch (error) {
-            if (error instanceof PrismaKnownError) {
-                switch (error.code) {
-                    case PrismaErrors.NOT_FOUND:
-                        throw new NotFoundError('Quiz');
-                    case PrismaErrors.CONFLICT:
-                        throw new ConflictError();
-                    default:
-                        throw error;
-                }
-            }
-            throw error;
-        }
+            }),
+            {
+                [PrismaErrors.NOT_FOUND]: new NotFoundError('Quiz'),
+                [PrismaErrors.CONFLICT]: new ConflictError(),
+            },
+        );
     },
+
+    get: async function (params: QuizFindUniqueArgs) {
+        return handlePrismaError(PrismaClient.quiz.findUniqueOrThrow(params), {
+            [PrismaErrors.NOT_FOUND]: new NotFoundError('Quiz'),
+        });
+    } as QuizRepositoryContract['get'],
+
+    getAll: async function (
+        params: QuizFindManyArgs & { pagination: PaginationParams },
+    ) {
+        const {
+            pagination: { perPage, page },
+            ...prismaArgs
+        } = params || {};
+        if (page && perPage) {
+            const result = await PrismaClient.quiz
+                .paginate(prismaArgs)
+                .withPages({
+                    page: page,
+                    limit: perPage,
+                });
+
+            return result;
+        }
+
+        return PrismaClient.quiz.findMany(prismaArgs);
+    } as QuizRepositoryContract['getAll'],
 };

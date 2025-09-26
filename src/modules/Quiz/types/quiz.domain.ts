@@ -64,3 +64,9 @@ export type SortOptions = {
     field: 'title' | 'createdAt';
     order: 'desc' | 'asc';
 };
+export type QuizFindManyArgs = Prisma.QuizFindManyArgs;
+export type QuizFindUniqueArgs = Prisma.QuizFindUniqueArgs;
+export type QuizForTeacher = QuizWithSelect<QuizSelect> & {
+    favouritedBy: { id: string }[];
+};
+

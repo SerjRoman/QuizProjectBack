@@ -23,7 +23,7 @@ export type AuthControllerContract<Req, Res, Params = void> = (
     params: Params,
 ) => void;
 
-export type PaginationType = { page: number; perPage: number };
+export type PaginationParams = { page: number; perPage: number };
 export type PaginationData = {
     isFirstPage: boolean;
     isLastPage: boolean;
