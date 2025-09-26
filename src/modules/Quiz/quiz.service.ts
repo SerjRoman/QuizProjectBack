@@ -1,14 +1,14 @@
 import { isObjectEmpty } from '@utils';
 import { QuizRepository } from './quiz.repository';
-import { IQuizService } from './types';
+import { QuizServiceContract } from './types';
 import { QuizOrderBy, QuizUncheckedCreateInput, QuizWhere } from './types';
-import { ForbiddenError } from '@errors';
+import { ForbiddenError, NotFoundError } from '@errors';
 import { UserRepository } from '@modules/User';
 import { QUIZ_COPY_SELECT } from './constants/quiz.constants';
 import { QuizBuilder } from './quiz.builder';
 import { PaginationData } from '#types';
 
-export const QuizService: IQuizService = {
+export const QuizService: QuizServiceContract = {
     getAllTeacher: async function ({
         select,
         filters,
@@ -31,7 +31,7 @@ export const QuizService: IQuizService = {
         if (select.createdBy) {
             dynamicSelect = QuizBuilder.buildSelectWithCreatedBy(dynamicSelect);
         }
-        if (select.favouritedByIds) {
+        if (select.favouritedBy) {
             dynamicSelect = QuizBuilder.buildSelectWithFavourite(
                 dynamicSelect,
                 userId,
@@ -40,34 +40,39 @@ export const QuizService: IQuizService = {
         let quizzes = [];
         let meta: PaginationData | undefined;
         if (pagination) {
-            [quizzes, meta] = await QuizRepository.getAllWithPagination<
-                typeof dynamicSelect
-            >(
-                pagination,
-                !isObjectEmpty(dynamicSelect) ? dynamicSelect : undefined,
-                prismaWhere,
-                orderBy,
+            [quizzes, meta] = await QuizRepository.getAll<typeof dynamicSelect>(
+                {
+                    select: !isObjectEmpty(dynamicSelect)
+                        ? dynamicSelect
+                        : undefined,
+                    where: prismaWhere,
+                    orderBy,
+                    pagination,
+                },
             );
         } else {
-            quizzes = await QuizRepository.getAllWithSelect<
-                typeof dynamicSelect
-            >(
-                !isObjectEmpty(dynamicSelect) ? dynamicSelect : undefined,
-                prismaWhere,
-                orderBy,
-            );
+            quizzes = await QuizRepository.getAll<typeof dynamicSelect>({
+                select: !isObjectEmpty(dynamicSelect)
+                    ? dynamicSelect
+                    : undefined,
+                where: prismaWhere,
+            });
         }
 
-        if (select.favouritedByIds) {
+        if (select.favouritedBy) {
             quizzes = QuizBuilder.enrichQuizzesWithFavouriteStatus(quizzes);
         }
-        return { data: quizzes, meta };
+        if (pagination && meta) {
+            return { data: quizzes, meta };
+        } else {
+            return { data: quizzes };
+        }
     },
-    getById: async function (id, select) {
-        return await QuizRepository.get<typeof select>(
-            { id },
-            !isObjectEmpty(select) ? select : undefined,
-        );
+    getById: async function ({ id, select }) {
+        return await QuizRepository.get({
+            where: { id },
+            select: !isObjectEmpty(select) ? select : undefined,
+        });
     },
     create: async function (data) {
         let prismaData: QuizUncheckedCreateInput = { ...data };
@@ -85,40 +90,56 @@ export const QuizService: IQuizService = {
         };
         return await QuizRepository.create(prismaData);
     },
-    delete: async function (id) {
-        return await QuizRepository.delete({ id });
+    async delete({ id, teacherId }) {
+        const quiz = await QuizRepository.get({
+            where: { id },
+            select: { ownedById: true },
+        });
+        if (quiz.ownedById !== teacherId) {
+            throw new ForbiddenError('You can only delete your own quizzes.');
+        }
+        return QuizRepository.delete({ id });
     },
-    updateFavourite: async function (userId, quizId) {
+    updateFavourite: async function ({ userId, quizId }) {
         return await QuizBuilder.manageFavouriteConnection(
             userId,
             quizId,
             'connect',
         );
     },
-    deleteFavourite: async function (userId, quizId) {
+    deleteFavourite: async function ({ userId, quizId }) {
         return await QuizBuilder.manageFavouriteConnection(
             userId,
             quizId,
             'disconnect',
         );
     },
-    // !FIX - use teacherId instead of userId
-    copyQuiz: async function (userId, quizId) {
-        const { teacherProfile } = await UserRepository.get(
-            { id: userId },
-            { teacherProfile: { select: { id: true } } },
-        );
+    async copyQuiz({ userId, quizId }) {
+        const { teacherProfile } = await UserRepository.get({
+            where: { id: userId },
+            select: { teacherProfile: { select: { id: true } } },
+        });
+
         if (!teacherProfile) {
             throw new ForbiddenError(
-                'You cannot copy quiz without TeacherProfile',
+                'Cannot copy quiz without a TeacherProfile.',
             );
         }
-        const quizToCopy = await QuizRepository.get<typeof QUIZ_COPY_SELECT>(
-            { id: quizId },
-            QUIZ_COPY_SELECT,
+
+        const quizToCopy = await QuizRepository.get({
+            where: { id: quizId },
+            select: QUIZ_COPY_SELECT,
+        });
+
+        if (!quizToCopy) {
+            throw new NotFoundError('Quiz to copy not found.');
+        }
+
+        const dataForNewQuiz = QuizBuilder.buildQuizCopyData(
+            quizToCopy,
+            teacherProfile.id,
         );
-        const dataToCreateQuiz: QuizUncheckedCreateInput =
-            QuizBuilder.buildQuizCopyData(quizToCopy, teacherProfile.id);
-        return await this.create(dataToCreateQuiz);
+
+        return this.create(dataForNewQuiz);
     },
 };

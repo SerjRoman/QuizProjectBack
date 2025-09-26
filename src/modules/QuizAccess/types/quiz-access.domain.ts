@@ -32,3 +32,7 @@ export type QuizAccessWhere = Prisma.QuizAccessWhereInput;
 export type QuizAccessUniqueWhere = Prisma.QuizAccessWhereUniqueInput;
 export type QuizAccessSelect = Prisma.QuizAccessSelect;
 export type QuizAccessInclude = Prisma.QuizAccessInclude;
+export type QuizAccessDefaultArgs = Prisma.QuizAccessDefaultArgs;
+export type QuizAccessFindManyArgs = Prisma.QuizAccessFindManyArgs;
+export type QuizAccessFindUniqueOrThrowArgs =
+    Prisma.QuizAccessFindUniqueOrThrowArgs;

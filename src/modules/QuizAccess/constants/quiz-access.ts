@@ -7,7 +7,7 @@ export const QUIZ_ACCESS_TYPE: EnumQuizAccessType[] = [
     'VIEWER',
 ];
 
-export const QUIZ_ACCESS_WITH_USER_ARGS =
+export const QUIZ_ACCESS_WITH_USER_INLCUDE =
     Prisma.validator<Prisma.QuizAccessDefaultArgs>()({
         include: {
             profile: {
@@ -23,4 +23,4 @@ export const QUIZ_ACCESS_WITH_USER_ARGS =
                 },
             },
         },
-    }).include;
+    }).include

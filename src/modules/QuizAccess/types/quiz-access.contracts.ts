@@ -45,29 +45,33 @@ export interface QuizAccessControllerContract {
         TeacherResponse<QuizAccess>
     >;
 }
+export type CanEditAccessByIdDto = { id: string; teacherId: string };
+export type CanEditAccessByQuizIdDto = { quizId: string; teacherId: string };
+export type DeleteAccessDto = { id: string };
+export type UpdateAccessTypeDto = {
+    id: string;
+    accessType: EnumQuizAccessType;
+};
+export type CreateAccessDto = {
+    quizId: string;
+    teacherUsername: string;
+    accessType: EnumQuizAccessType;
+};
+export type GetAllByQuizIdDto = { quizId: string };
 
 export interface QuizAccessServiceContract {
-    canEditAccessByQuizId: (
-        quizId: string,
-        teacherId: string,
-    ) => Promise<boolean>;
-    canEditAccessById: (id: string, teacherId: string) => Promise<boolean>;
-    create: (data: {
-        quizId: string;
-        teacherUsername: string;
-        accessType: EnumQuizAccessType;
-    }) => Promise<QuizAccess>;
-    getAllByQuizId: (quizId: string) => Promise<QuizAccessesWithUser[]>;
-    delete: (id: string) => Promise<QuizAccess>;
-    updateAccessType: (
-        id: string,
-        accessType: EnumQuizAccessType,
-    ) => Promise<QuizAccess>;
+    canEditAccessById: (dto: CanEditAccessByIdDto) => Promise<boolean>;
+    canEditAccessByQuizId: (dto: CanEditAccessByQuizIdDto) => Promise<boolean>;
+    delete: (dto: DeleteAccessDto) => Promise<QuizAccess>;
+    updateAccessType: (dto: UpdateAccessTypeDto) => Promise<QuizAccess>;
+    create: (dto: CreateAccessDto) => Promise<QuizAccess>;
+    getAllByQuizId: (dto: GetAllByQuizIdDto) => Promise<QuizAccessesWithUser[]>;
 }
+
 export interface QuizAccessRepositoryContract {
     create: (data: QuizAccessUncheckedCreateInput) => Promise<QuizAccess>;
     getAll: {
-        (params: { where: QuizAccessWhere }): Promise<QuizAccess[]>;
+        (params: { where: QuizAccessWhere }): Promise<QuizAccess[]>; // Эта сигнатура остается
         <S extends QuizAccessSelect>(params: {
             where: QuizAccessWhere;
             select: S;

@@ -7,6 +7,7 @@ import {
     SortOptions,
 } from '../types';
 import { KeysArray } from '#types';
+import { Prisma } from '@prisma/client';
 
 export const QUIZ_OMIT: KeysArray<QuizOmit> = [
     'id',
@@ -74,7 +75,7 @@ export const QUIZ_INCLUDE: KeysArray<QuizInclude> = [
 export const QUIZ_STATUS: QuizStatus[] = ['PUBLISHED', 'DRAFT'];
 export const QUIZ_VISIBILITY: QuizVisibility[] = ['PRIVATE', 'PUBLIC'];
 
-export const QUIZ_COPY_SELECT: QuizSelect = {
+export const QUIZ_COPY_SELECT = Prisma.validator<QuizSelect>()({
     id: true,
     questions: true,
     title: true,
@@ -86,7 +87,7 @@ export const QUIZ_COPY_SELECT: QuizSelect = {
     visibility: true,
     coverImage: true,
     ownedById: true,
-};
+});
 
 export const ORDER_OPTIONS: SortOptions['order'][] = ['desc', 'asc'];
 export const SORT_FIELD_OPTIONS: SortOptions['field'][] = [

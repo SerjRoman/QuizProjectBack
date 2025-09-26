@@ -2,7 +2,7 @@ import {
     AuthRequest,
     TeacherResponse,
     AuthControllerContract,
-    PaginationType,
+    PaginationParams,
     PaginatedResult,
     PaginationData,
 } from '#types';
@@ -10,44 +10,42 @@ import { InferType } from 'yup';
 import { QuizSchema } from '../quiz.schema';
 import {
     Quiz,
-    QuizOrderBy,
     QuizSelect,
     QuizUpdateInput,
     QuizWhere,
     QuizWhereUnique,
     QuizWithSelect,
     QuizUncheckedCreateInput,
-    SortOptions,
+    QuizInclude,
+    QuizWithInclude,
+    QuizFindManyArgs,
 } from './quiz.domain';
+import {
+    GetAllTeacherQuizzesDto,
+    GetQuizByIdDto,
+    DeleteQuizDto,
+    CreateQuizDto,
+    UpdateFavouriteDto,
+    CopyQuizDto,
+} from './quiz.dto';
 
+type GetAllTeacherQuizzesResponse =
+    | {
+          data: QuizWithSelect[] | Quiz[];
+          meta?: PaginationData;
+      }
+    | Quiz[];
 type CommonTeacherRequest = (
     req: AuthRequest<
         object,
-        object,
+        GetAllTeacherQuizzesResponse,
         object,
         InferType<typeof QuizSchema.getAll>['query']
     >,
-    res: TeacherResponse<{
-        data: QuizWithSelect[] | Quiz[];
-        meta?: PaginationData;
-    }>,
+    res: TeacherResponse<GetAllTeacherQuizzesResponse>,
 ) => void;
 
-type GetAllServiceParams = {
-    select: QuizSelect;
-    filters?: {
-        tags?: string[];
-        languages?: string[];
-        subject?: string;
-        search?: string;
-    };
-    where?: QuizWhere;
-    pagination?: PaginationType;
-    userId?: string;
-    sort?: SortOptions;
-};
-
-export interface IQuizController {
+export interface QuizControllerContract {
     teacherMy: CommonTeacherRequest;
     teacherMyCopied: CommonTeacherRequest;
     teacherMyFavourite: CommonTeacherRequest;
@@ -81,14 +79,11 @@ export interface IQuizController {
     handleTeacherQuizRequest: (
         req: AuthRequest<
             object,
-            object,
+            GetAllTeacherQuizzesResponse,
             object,
             InferType<typeof QuizSchema.getAll>['query']
         >,
-        res: TeacherResponse<{
-            data: QuizWithSelect[] | Quiz[];
-            meta?: PaginationData;
-        }>,
+        res: TeacherResponse<GetAllTeacherQuizzesResponse>,
         prismaWhereClause: QuizWhere,
     ) => void;
     addToFavourites: AuthControllerContract<
@@ -101,41 +96,46 @@ export interface IQuizController {
     >;
 }
 
-export interface IQuizService {
+export interface QuizServiceContract {
     getAllTeacher: (
-        params: GetAllServiceParams,
-    ) => Promise<{ data: QuizWithSelect[] | Quiz[]; meta?: PaginationData }>;
-    getById: (id: string, select: QuizSelect) => Promise<QuizWithSelect>;
-    delete: (id: string) => Promise<Quiz>;
-    create: (data: QuizUncheckedCreateInput) => Promise<Quiz>;
-    updateFavourite: (userId: string, quizId: string) => Promise<Quiz>;
-    deleteFavourite: (userId: string, quizId: string) => Promise<Quiz>;
-    copyQuiz: (userId: string, quizId: string) => Promise<Quiz>;
+        dto: GetAllTeacherQuizzesDto,
+    ) => Promise<{ data: Quiz[] | QuizWithSelect[]; meta?: PaginationData }>;
+    getById: (dto: GetQuizByIdDto) => Promise<Quiz>;
+    delete: (dto: DeleteQuizDto) => Promise<Quiz>;
+    create: (dto: CreateQuizDto) => Promise<Quiz>;
+    updateFavourite: (dto: UpdateFavouriteDto) => Promise<Quiz>;
+    deleteFavourite: (dto: UpdateFavouriteDto) => Promise<Quiz>;
+    copyQuiz: (dto: CopyQuizDto) => Promise<Quiz>;
 }
 
-export interface IQuizRepository {
-    getAllWithSelect: {
-        <S extends QuizSelect>(
-            select?: S,
-            where?: QuizWhere,
-            orderBy?: QuizOrderBy,
-        ): Promise<QuizWithSelect<S>[]>;
-        (where?: QuizWhere, orderBy?: QuizOrderBy): Promise<Quiz[]>;
-    };
-    getAllWithPagination: <S extends QuizSelect>(
-        pagination: PaginationType,
-        select?: S,
-        where?: QuizWhere,
-        orderBy?: QuizOrderBy,
-    ) => Promise<PaginatedResult<QuizWithSelect<S>[]>>;
-    get: {
-        (where: QuizWhereUnique): Promise<Quiz>;
-        <S extends QuizSelect>(
-            where: QuizWhereUnique,
-            select?: QuizSelect,
-        ): Promise<QuizWithSelect<S>>;
-    };
-    delete: (where: QuizWhereUnique) => Promise<Quiz>;
+export interface QuizRepositoryContract {
     create: (data: QuizUncheckedCreateInput) => Promise<Quiz>;
+    delete: (where: QuizWhereUnique) => Promise<Quiz>;
     update: (where: QuizWhereUnique, data: QuizUpdateInput) => Promise<Quiz>;
+
+    get: {
+        (params: { where: QuizWhereUnique }): Promise<Quiz>;
+        <S extends QuizSelect>(params: {
+            where: QuizWhereUnique;
+            select?: S;
+        }): Promise<QuizWithSelect<S>>;
+        <I extends QuizInclude>(params: {
+            where: QuizWhereUnique;
+            include?: I;
+        }): Promise<QuizWithInclude<I>>;
+    };
+
+    getAll: {
+        (params?: QuizFindManyArgs): Promise<Quiz[]>;
+
+        <S extends QuizSelect>(
+            params: QuizFindManyArgs & { pagination: PaginationParams },
+        ): Promise<PaginatedResult<QuizWithSelect<S>[]>>;
+        <S extends QuizSelect>(
+            params: QuizFindManyArgs,
+        ): Promise<QuizWithSelect<S>[]>;
+        <I extends QuizInclude>(
+            params: QuizFindManyArgs,
+        ): Promise<QuizWithInclude<I>[]>;
+    };
 }

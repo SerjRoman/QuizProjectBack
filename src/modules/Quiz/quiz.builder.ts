@@ -2,6 +2,7 @@ import { InputJsonValue } from '#types';
 import { QUIZ_COPY_SELECT } from './constants';
 import { QuizRepository } from './quiz.repository';
 import {
+    QuizForTeacher,
     QuizOrderBy,
     QuizSelect,
     QuizStatus,
@@ -65,13 +66,12 @@ export const QuizBuilder = {
         userId: string | undefined,
     ) {
         const selectWithFavourite: QuizSelect = { ...select };
-        selectWithFavourite._count = {
+        selectWithFavourite.favouritedBy = {
+            where: {
+                id: userId,
+            },
             select: {
-                favouritedBy: {
-                    where: {
-                        id: userId,
-                    },
-                },
+                id: true,
             },
         };
         return selectWithFavourite;
@@ -92,21 +92,21 @@ export const QuizBuilder = {
         };
         return selectWithCreatedBy;
     },
-    enrichQuizzesWithFavouriteStatus: function (
-        quizzes: QuizWithSelect<{
-            _count: { select: { favouritedBy: { where: { id: string } } } };
-        }>[],
-    ) {
-        const enrichedQuizzes = quizzes.map((quiz) => {
-            const { _count, ...restOfQuiz } = quiz;
-            const isFavourite = _count.favouritedBy > 0;
+    enrichQuizzesWithFavouriteStatus(
+        quizzes: QuizForTeacher[],
+    ): (Omit<QuizForTeacher, 'favouritedBy'> & { isFavourite: boolean })[] {
+        return quizzes.map((quiz) => {
+            const { favouritedBy, ...restOfQuiz } = quiz;
+
+            const isFavourite = favouritedBy.length > 0;
+
             return {
                 ...restOfQuiz,
                 isFavourite,
             };
         });
-        return enrichedQuizzes;
     },
+
     manageFavouriteConnection: function (
         userId: string,
         quizId: string,

@@ -1,9 +1,10 @@
 import { arrayToBooleanObject } from '@utils';
 import { QuizService } from './quiz.service';
 import type { QuizUncheckedCreateInput, QuizWhere } from './types';
-import type { IQuizController } from './types';
+import type { QuizControllerContract } from './types';
+import { GetAllTeacherQuizzesDto } from './types/quiz.dto';
 
-export const QuizController: IQuizController = {
+export const QuizController: QuizControllerContract = {
     handleTeacherQuizRequest: async function (req, res, prismaWhereClause) {
         const { query } = req;
         const select = arrayToBooleanObject(query?.select);
@@ -11,6 +12,7 @@ export const QuizController: IQuizController = {
         const page = query?.page ? Number(query.page) : undefined;
         const pagination = perPage && page ? { perPage, page } : undefined;
         const sort = query?.sort;
+
         const commonFilters = {
             tags: query?.tags,
             languages: query?.languages,
@@ -20,21 +22,21 @@ export const QuizController: IQuizController = {
             status: query?.status,
         };
 
-        const params = {
-            select,
+        const dto: GetAllTeacherQuizzesDto = {
+            userId: res.locals.userId,
+            pagination: pagination,
             filters: commonFilters,
+            sort: sort,
             where: prismaWhereClause,
-            pagination,
-            sort,
+            select: select,
         };
-
-        const result = await QuizService.getAllTeacher(params);
+        const result = await QuizService.getAllTeacher(dto);
         res.status(200).json(result);
     },
     getById: async function (req, res) {
         const id = req.params.id;
         const select = arrayToBooleanObject(req.query?.select);
-        res.status(200).json(await QuizService.getById(id, select));
+        res.status(200).json(await QuizService.getById({ id, select }));
     },
     create: async function (req, res) {
         const data: QuizUncheckedCreateInput = {
@@ -45,7 +47,10 @@ export const QuizController: IQuizController = {
         res.status(201).json(await QuizService.create(data));
     },
     delete: async function (req, res) {
-        await QuizService.delete(req.params.id);
+        await QuizService.delete({
+            id: req.params.id,
+            teacherId: res.locals.teacherId,
+        });
         res.status(204).json();
     },
     teacherMy: async function (req, res) {
@@ -93,26 +98,29 @@ export const QuizController: IQuizController = {
         QuizController.handleTeacherQuizRequest(req, res, prismaWhereClause);
     },
     addToFavourites: async function (req, res) {
-        const result = await QuizService.updateFavourite(
-            res.locals.userId,
-            req.params.id,
-        );
+        const result = await QuizService.updateFavourite({
+            userId: res.locals.userId,
+            quizId: req.params.id,
+        });
         if (result) {
             res.status(204).json();
         }
     },
     removeFromFavourites: async function (req, res) {
-        const result = await QuizService.deleteFavourite(
-            res.locals.userId,
-            req.params.id,
-        );
+        const result = await QuizService.deleteFavourite({
+            userId: res.locals.userId,
+            quizId: req.params.id,
+        });
         if (result) {
             res.status(204).json();
         }
     },
     copyQuiz: async function (req, res) {
         res.status(201).json(
-            await QuizService.copyQuiz(res.locals.userId, req.body.id),
+            await QuizService.copyQuiz({
+                userId: res.locals.userId,
+                quizId: req.body.id,
+            }),
         );
     },
 };
