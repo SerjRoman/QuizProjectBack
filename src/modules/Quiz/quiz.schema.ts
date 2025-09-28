@@ -44,7 +44,7 @@ export const QuizSchema = {
                 title: yup.string().min(3).required('Title is required'),
                 subjectId: yup
                     .string()
-                    .length(25)
+                    .length(24)
                     .required('Subject ID is required'),
                 coverImage: yup.string().optional(),
                 tagsIds: yup.array().of(yup.string().required()).optional(),

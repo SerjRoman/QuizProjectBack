@@ -8,7 +8,7 @@ import { errorHandlerMiddleware } from '@middlewares';
 const app = express();
 
 app.use(cors());
-app.use(json());
+app.use(json({limit: 1024 * 1024 * 20})); 
 app.use(parseJsonQueryMiddleware);
 
 app.use(AppRouter);
