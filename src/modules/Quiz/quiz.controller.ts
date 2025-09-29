@@ -57,7 +57,7 @@ export const QuizController: QuizControllerContract = {
         const prismaWhereClause: QuizWhere = {
             OR: [
                 {
-                    ownedBy: { userId: res.locals.userId },
+                    ownedBy: { id: res.locals.teacherId },
                 },
                 { accesses: { some: { profileId: res.locals.teacherId } } },
             ],
@@ -69,11 +69,11 @@ export const QuizController: QuizControllerContract = {
             AND: [
                 {
                     NOT: {
-                        createdBy: { userId: res.locals.userId },
+                        createdBy: { id: res.locals.teacherId },
                     },
                 },
                 {
-                    ownedBy: { userId: res.locals.userId },
+                    ownedBy: { id: res.locals.teacherId },
                 },
             ],
         };
@@ -81,7 +81,7 @@ export const QuizController: QuizControllerContract = {
     },
     teacherMyCreated: async function (req, res) {
         const prismaWhereClause: QuizWhere = {
-            createdBy: { userId: res.locals.userId },
+            createdBy: { id: res.locals.teacherId },
         };
         QuizController.handleTeacherQuizRequest(req, res, prismaWhereClause);
     },
