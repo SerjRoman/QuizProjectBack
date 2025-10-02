@@ -4,8 +4,8 @@ model Report {
   classroomId String    @db.ObjectId
   classroom   Classroom @relation(fields: [classroomId], references: [id], name: "ReportClassroomRelation")
 
-  roomId String @db.ObjectId
-  room   Room   @relation(fields: [roomId], references: [id], name: "RoomReportRelation")
+  sessionId String  @db.ObjectId
+  session   Session @relation(fields: [sessionId], references: [id], name: "SessionReportRelation")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

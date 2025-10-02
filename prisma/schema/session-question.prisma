@@ -1,0 +1,7 @@
+model SessionQuestion {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  originalQuestionId String              @db.ObjectId
+  // originalQuestion Question @relation(fields: [originalQuestionId], references: [id])
+  attempts           QuizAttemptAnswer[]
+}

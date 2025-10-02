@@ -1,0 +1,20 @@
+enum SessionStatus {
+  ACTIVE
+  FINISHED
+  WAITING
+}
+
+model Session {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name         String
+  status       SessionStatus
+  participants QuizParticipant[] @relation(name: "QuizParticipantSessionRelation")
+  quizId       String            @db.ObjectId
+  quiz         Quiz              @relation(fields: [quizId], references: [id], name: "QuizSessionRelation")
+
+  reports Report[] @relation(name: "SessionReportRelation")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

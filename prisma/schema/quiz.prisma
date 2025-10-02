@@ -2,16 +2,17 @@ enum QuizStatus {
   PUBLISHED
   DRAFT
 }
+
 enum QuizVisibility {
-    PRIVATE
-    PUBLIC
+  PRIVATE
+  PUBLIC
 }
 
 model Quiz {
-  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  id         String         @id @default(auto()) @map("_id") @db.ObjectId
   title      String
-  visibility  QuizVisibility    @default(PRIVATE)
-  status     QuizStatus @default(DRAFT)
+  visibility QuizVisibility @default(PRIVATE)
+  status     QuizStatus     @default(DRAFT)
   coverImage String?
 
   tags    Tag[]    @relation(fields: [tagsIds], references: [id], name: "QuizTagRelation")
@@ -34,14 +35,14 @@ model Quiz {
 
   createdBy   TeacherProfile @relation(fields: [createdById], references: [id], name: "CreatedQuizzesRelation")
   createdById String         @db.ObjectId
-  
-  ownedBy TeacherProfile @relation(fields: [ownedById], references: [id], name: "OwnedByQuizzesRelation")
-  ownedById String @db.ObjectId
+
+  ownedBy   TeacherProfile @relation(fields: [ownedById], references: [id], name: "OwnedByQuizzesRelation")
+  ownedById String         @db.ObjectId
 
   copiedBy    TeacherProfile[] @relation(fields: [copiedByIds], references: [id], name: "CopiedQuizzesRelation")
   copiedByIds String[]         @db.ObjectId
-  
-  originalQuiz Quiz? @relation(fields: [originalQuizId], references: [id], name: "QuizCopiedRelation", onDelete: NoAction, onUpdate: NoAction)
+
+  originalQuiz   Quiz?   @relation(fields: [originalQuizId], references: [id], name: "QuizCopiedRelation", onDelete: NoAction, onUpdate: NoAction)
   originalQuizId String? @db.ObjectId
 
   copies Quiz[] @relation(name: "QuizCopiedRelation")
@@ -53,14 +54,7 @@ model Quiz {
   folderIds String[]     @db.ObjectId
   questions Question[]
 
-  attempted QuizAttempt[] @relation(name: "QuizParticipantAttemptQuizRelation")
-
-  rooms Room[] @relation(name: "QuizRoomRelation")
+  sessions Session[] @relation(name: "QuizSessionRelation")
 
   accesses QuizAccess[] @relation(name: "QuizAccessQuiz")
 }
-
-
-
-
-

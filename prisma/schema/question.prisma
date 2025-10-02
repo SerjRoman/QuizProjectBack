@@ -5,8 +5,6 @@ model Question {
   createdAt DateTime     @default(now())
   quiz      Quiz         @relation(fields: [quizId], references: [id])
   quizId    String       @db.ObjectId
-
-  answerAttempts QuizAttemptAnswer[] @relation(name: "QuizAttemptAnswerQuestionRelation")
 }
 
 enum QuestionType {
