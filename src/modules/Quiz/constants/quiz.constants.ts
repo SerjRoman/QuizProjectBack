@@ -56,11 +56,11 @@ export const QUIZ_SELECT: KeysArray<QuizSelect> = [
     'questions',
     'tags',
     'copies',
+    'sessions',
 ];
 
 export const QUIZ_INCLUDE: KeysArray<QuizInclude> = [
     '_count',
-    'attempted',
     'completedBy',
     'copiedBy',
     'createdBy',
@@ -68,7 +68,7 @@ export const QUIZ_INCLUDE: KeysArray<QuizInclude> = [
     'folders',
     'languages',
     'questions',
-    'rooms',
+    'sessions',
     'subject',
     'tags',
 ];

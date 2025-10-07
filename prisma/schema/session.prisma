@@ -9,7 +9,9 @@ model Session {
 
   name         String
   status       SessionStatus
+  
   participants QuizParticipant[] @relation(name: "QuizParticipantSessionRelation")
+
   quizId       String            @db.ObjectId
   quiz         Quiz              @relation(fields: [quizId], references: [id], name: "QuizSessionRelation")
 
