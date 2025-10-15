@@ -11,7 +11,7 @@ model QuizAccess {
   profile   TeacherProfile @relation(fields: [profileId], references: [id], name: "QuizAccessProfile")
   profileId String         @db.ObjectId
 
-  quiz   Quiz   @relation(fields: [quizId], references: [id], name: "QuizAccessQuiz")
+  quiz   Quiz   @relation(fields: [quizId], references: [id], name: "QuizAccessQuiz", onDelete: Cascade)
   quizId String @db.ObjectId
 
   @@unique([quizId, profileId])

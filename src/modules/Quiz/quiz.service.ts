@@ -100,14 +100,14 @@ export const QuizService: QuizServiceContract = {
         }
         return QuizRepository.delete({ id });
     },
-    updateFavourite: async function ({ userId, quizId }) {
+    async updateFavourite({ userId, quizId }) {
         return await QuizBuilder.manageFavouriteConnection(
             userId,
             quizId,
             'connect',
         );
     },
-    deleteFavourite: async function ({ userId, quizId }) {
+    async deleteFavourite({ userId, quizId }) {
         return await QuizBuilder.manageFavouriteConnection(
             userId,
             quizId,
