@@ -2,16 +2,15 @@
     "include": ["src/**/*", "types/declrations/*.d.ts"],
     "exclude": ["./jest.config.js"],
     "compilerOptions": {
-        "baseUrl": ".",
         "paths": {
-            "#types": ["src/types/"],
-            "#prisma/*": ["src/generated/*"],
-            "@utils": ["src/utils"],
-            "@modules/*": ["src/modules/*"],
-            "@middlewares": ["src/middlewares"],
-            "@errors": ["src/errors"],
-            "@prisma": ["src/prisma"],
-            "@config": ["src/config"]
+            "#types": ["./src/types/"],
+            "#prisma-types": ["./src/generated/prisma/"],
+            "@utils": ["./src/utils"],
+            "@modules/*": ["./src/modules/*"],
+            "@middlewares": ["./src/middlewares"],
+            "@errors": ["./src/errors"],
+            "@prisma": ["./src/prisma"],
+            "@config": ["./src/config"]
         },
         "target": "es2016",
         "module": "commonjs",

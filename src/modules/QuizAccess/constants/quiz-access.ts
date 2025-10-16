@@ -1,4 +1,4 @@
-import { Prisma } from '#prisma/prisma';
+import { Prisma } from '#prisma-types';
 import { EnumQuizAccessType } from '../types';
 
 export const QUIZ_ACCESS_TYPE: EnumQuizAccessType[] = [

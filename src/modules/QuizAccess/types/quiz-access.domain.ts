@@ -1,4 +1,4 @@
-import { $Enums, Prisma, QuizAccess as PrismaQuizAccess } from '#prisma/prisma';
+import { $Enums, Prisma, QuizAccess as PrismaQuizAccess } from '#prisma-types';
 
 export type QuizAccessUncheckedCreateInput =
     Prisma.QuizAccessUncheckedCreateInput;

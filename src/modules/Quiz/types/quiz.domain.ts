@@ -3,7 +3,7 @@ import {
     Quiz as QuizPrisma,
     QuizStatus as QuizStatusPrisma,
     QuizVisibility as QuizVisibilityPrisma,
-} from '#prisma/prisma';
+} from '#prisma-types';
 
 export type Quiz = QuizPrisma;
 

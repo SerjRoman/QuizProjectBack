@@ -1,4 +1,4 @@
-import type { Prisma, Language as PrismaLanguage } from '#prisma/prisma';
+import type { Prisma, Language as PrismaLanguage } from '#prisma-types';
 import { AuthRequest, AuthResponse } from '#types';
 import { InferType } from 'yup';
 import { LanguageSchema } from './language.schema';

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { ValidationError } from 'src/errors/app-errors';
+import { ValidationError } from '@errors';
 import { AnySchema, ValidationError as YupValidationError } from 'yup';
 
 export const validateMiddleware = (schema: AnySchema) =>
@@ -18,6 +18,7 @@ export const validateMiddleware = (schema: AnySchema) =>
             );
             req.query = validated.query;
             req.body = validated.body;
+            req.params = validated.params
 
             return next();
         } catch (error) {

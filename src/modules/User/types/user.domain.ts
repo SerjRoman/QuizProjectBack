@@ -1,4 +1,4 @@
-import { $Enums, Prisma, User as PrismaUser } from '#prisma/prisma/';
+import { $Enums, Prisma, User as PrismaUser } from '#prisma-types';
 
 export type User = PrismaUser;
 export type UserWithoutPassword = Omit<User, 'password'>;

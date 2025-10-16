@@ -1,4 +1,4 @@
-import type { Prisma, Tag as PrismaTag } from '#prisma/prisma';
+import type { Prisma, Tag as PrismaTag } from '#prisma-types';
 import { AuthRequest, AuthResponse } from '#types';
 import { InferType } from 'yup';
 import { TagSchema } from './tag.schema';

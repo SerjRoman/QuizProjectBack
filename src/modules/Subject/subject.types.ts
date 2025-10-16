@@ -1,4 +1,4 @@
-import type { Prisma, Subject as PrismaSubject } from '#prisma/prisma';
+import type { Prisma, Subject as PrismaSubject } from '#prisma-types';
 import { AuthRequest, AuthResponse } from '#types';
 import { InferType } from 'yup';
 import { SubjectSchema } from './subject.schema';

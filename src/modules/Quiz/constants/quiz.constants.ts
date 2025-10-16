@@ -7,7 +7,7 @@ import {
     SortOptions,
 } from '../types';
 import { KeysArray } from '#types';
-import { Prisma } from '#prisma/prisma';
+import { Prisma } from '#prisma-types';
 
 export const QUIZ_OMIT: KeysArray<QuizOmit> = [
     'id',

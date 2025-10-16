@@ -1,4 +1,3 @@
-import { InputJsonValue } from '#types';
 import { QUIZ_COPY_SELECT } from './constants';
 import { QuizRepository } from './quiz.repository';
 import {
@@ -128,11 +127,12 @@ export const QuizBuilder = {
         quizToCopy: QuizWithSelect<typeof QUIZ_COPY_SELECT>,
         teacherProfileId: string,
     ) {
-        const questionsToCopy = quizToCopy.questions
-            .filter((q) => {
-                if (q.data) return true;
-            })
-            .map((q) => ({ type: q.type, data: q.data as InputJsonValue }));
+        const questionsToCopy = quizToCopy.questions.map((q) => ({
+            question: { connect: { id: q.id } },
+            questionId: q.id,
+            order: q.order,
+            time: q.time,
+        }));
         const dataToCreateQuiz: QuizUncheckedCreateInput = {
             status: 'DRAFT',
             title: `Copied ${quizToCopy.title}`,

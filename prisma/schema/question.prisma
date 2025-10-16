@@ -1,13 +1,18 @@
 model Question {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  type      QuestionType
-  data      Json
-  createdAt DateTime     @default(now())
-  quiz      Quiz         @relation(fields: [quizId], references: [id])
-  quizId    String       @db.ObjectId
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  type            QuestionType
+  data            Json
+  quizzes         QuestionToQuiz[]
+  createdAt       DateTime         @default(now())
+  updateAt        DateTime         @default(now())
+  favouritedBy    TeacherProfile[] @relation(fields: [favouritedByIds], references: [id], name: "FavouriteQuestionsRelation")
+  favouritedByIds String[]         @db.ObjectId
+  createdBy       TeacherProfile   @relation(fields: [createdById], references: [id], name: "CreatedQuestionsRelation")
+  createdById     String           @db.ObjectId
 }
 
 enum QuestionType {
-  multiChoice
-  singleChoice
+  MULTIPLE_CHOICE
+  SINGLE_CHOICE
+  FILL_IN_THE_GAP
 }

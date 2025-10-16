@@ -1,6 +1,5 @@
 model Classroom {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
+  id        String            @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
@@ -11,13 +10,11 @@ model Classroom {
 }
 
 model ClassroomMember {
-  id String @id @default(auto()) @map("_id") @db.ObjectId
-
+  id          String         @id @default(auto()) @map("_id") @db.ObjectId
   classroom   Classroom      @relation(fields: [classroomId], references: [id], name: "ClassroomMemberRelation")
   classroomId String         @db.ObjectId
   student     StudentProfile @relation(fields: [studentId], references: [id], name: "ClassroomMemberStudentRelation")
   studentId   String         @db.ObjectId
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 }

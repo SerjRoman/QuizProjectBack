@@ -68,12 +68,8 @@ export const QuizController: QuizControllerContract = {
         const prismaWhereClause: QuizWhere = {
             AND: [
                 {
-                    NOT: {
-                        createdBy: { id: res.locals.teacherId },
-                    },
-                },
-                {
                     ownedBy: { id: res.locals.teacherId },
+                    originalQuizId: { not: null },
                 },
             ],
         };

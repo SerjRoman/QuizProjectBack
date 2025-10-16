@@ -15,7 +15,7 @@ router.use(checkRole('TEACHER'));
 router.use(authenticateTeacherMiddleware);
 
 router.get(
-    '/quiz/:id',
+    '/quiz/:quizId',
     validateMiddleware(QuizAccessSchema.getQuizAccessesByQuiz),
     QuizAccessController.getAllByQuizId,
 );
