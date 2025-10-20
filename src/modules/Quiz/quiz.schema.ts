@@ -41,11 +41,15 @@ export const QuizSchema = {
     create: yup
         .object({
             body: yup.object({
-                title: yup.string().min(3).required('Title is required'),
+                title: yup
+                    .string()
+                    .min(3, 'TITLE_MIN_LENGTH')
+                    .max(100, 'TITLE_MAX_LENGTH')
+                    .required('TITLE_REQUIRED'),
                 subjectId: yup
                     .string()
-                    .length(24)
-                    .required('Subject ID is required'),
+                    .length(24, 'SUBJECT_ID_FORMAT')
+                    .required('SUBJECT_REQUIRED'),
                 coverImage: yup.string().optional(),
                 tagsIds: yup.array().of(yup.string().required()).optional(),
                 languagesIds: yup
@@ -54,7 +58,9 @@ export const QuizSchema = {
                     .optional(),
                 shuffleAnswers: yup.boolean().default(false),
                 shuffleQuestions: yup.boolean().default(false),
-                visibility: yup.string().oneOf(QUIZ_VISIBILITY),
+                visibility: yup
+                    .string()
+                    .oneOf(QUIZ_VISIBILITY, 'VISIBILITY_VALUES'),
             }),
         })
         .required(),
@@ -78,7 +84,7 @@ export const QuizSchema = {
     }),
     delete: yup.object({
         params: yup.object({
-            id: yup.string().required(),
+            id: yup.string().required('ID_REQUIRED'),
         }),
     }),
     teacherMy: yup.object({
@@ -122,13 +128,16 @@ export const QuizSchema = {
             status: yup.string().oneOf(QUIZ_STATUS).optional(),
             isPrivate: yup.boolean().optional(),
             shuffleAnswers: yup.boolean().optional(),
-        }),
+        }).required("BODY_REQUIRED"),
     }),
     copyQuiz: yup.object({
-        body: yup
-            .object({
-                id: yup.string().length(24).required(),
-            })
-            .required(),
+        body: yup.object({
+            id: yup.string().length(24).required("ID_REQUIRED"),
+        }).required("BODY_REQUIRED"),
+    }),
+    uploadImage: yup.object({
+        body: yup.object({
+            fileType: yup.string().required('ID_REQUIRED'),
+        }),
     }),
 };

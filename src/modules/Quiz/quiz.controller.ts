@@ -119,4 +119,9 @@ export const QuizController: QuizControllerContract = {
             }),
         );
     },
+    uploadImage: async function (req, res) {
+        const imageType = req.body.fileType;
+        const assignedUrl = await QuizService.uploadImage({ imageType });
+        res.status(200).json(assignedUrl);
+    },
 };

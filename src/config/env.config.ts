@@ -14,4 +14,7 @@ export const env = cleanEnv(process.env, {
     REFRESH_SECRET_KEY: str(),
     JWT_EXPIRES_IN: str(),
     REFRESH_JWT_EXPIRES_IN: str(),
+    CLOUDINARY_CLOUD_NAME: str(),
+    CLOUDINARY_API_KEY: str(),
+    CLOUDINARY_API_SECRET: str(),
 });

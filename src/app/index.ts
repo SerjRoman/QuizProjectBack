@@ -4,11 +4,14 @@ import { json } from 'body-parser';
 import { AppRouter } from './routes';
 import { parseJsonQueryMiddleware } from '@middlewares';
 import { errorHandlerMiddleware } from '@middlewares';
+import { configureCloudinary } from '@config';
+
+configureCloudinary();
 
 const app = express();
 
 app.use(cors());
-app.use(json({limit: 1024 * 1024 * 20})); 
+app.use(json({ limit: 1024 * 1024 * 20 }));
 app.use(parseJsonQueryMiddleware);
 
 app.use(AppRouter);

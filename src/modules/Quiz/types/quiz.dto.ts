@@ -24,3 +24,4 @@ export type DeleteQuizDto = { id: string; teacherId: string };
 export type CreateQuizDto = QuizUncheckedCreateInput;
 export type UpdateFavouriteDto = { userId: string; quizId: string };
 export type CopyQuizDto = { userId: string; quizId: string };
+export type UploadImageDto = { imageType: string };
