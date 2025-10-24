@@ -27,6 +27,7 @@ import {
     CreateQuizDto,
     UpdateFavouriteDto,
     CopyQuizDto,
+    UploadImageDto,
 } from './quiz.dto';
 
 type GetAllTeacherQuizzesResponse =
@@ -45,6 +46,16 @@ type CommonTeacherRequest = (
     res: TeacherResponse<GetAllTeacherQuizzesResponse>,
 ) => void;
 
+export type GetQuizUploadUrl = {
+    signature: string;
+    timestamp: string;
+    apiKey: string;
+    uploadUrl: string;
+    cloudName: string;
+    folder: string;
+    public_id: string;
+    transformation: string;
+};
 export interface QuizControllerContract {
     teacherMy: CommonTeacherRequest;
     teacherMyCopied: CommonTeacherRequest;
@@ -94,6 +105,14 @@ export interface QuizControllerContract {
         AuthRequest<InferType<typeof QuizSchema.deleteFavourite>['params']>,
         TeacherResponse<void>
     >;
+    uploadImage: AuthControllerContract<
+        AuthRequest<
+            object,
+            GetQuizUploadUrl,
+            InferType<typeof QuizSchema.uploadImage>['body']
+        >,
+        TeacherResponse<GetQuizUploadUrl>
+    >;
 }
 
 export interface QuizServiceContract {
@@ -106,6 +125,7 @@ export interface QuizServiceContract {
     updateFavourite: (dto: UpdateFavouriteDto) => Promise<Quiz>;
     deleteFavourite: (dto: UpdateFavouriteDto) => Promise<Quiz>;
     copyQuiz: (dto: CopyQuizDto) => Promise<Quiz>;
+    uploadImage: (dto: UploadImageDto) => Promise<GetQuizUploadUrl>;
 }
 
 export interface QuizRepositoryContract {

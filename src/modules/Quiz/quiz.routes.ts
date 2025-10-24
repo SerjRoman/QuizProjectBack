@@ -86,5 +86,13 @@ router.post(
     validateMiddleware(QuizSchema.copyQuiz),
     QuizController.copyQuiz,
 );
+router.post(
+    '/upload-cover',
+    authenticateMiddleware,
+    checkRole('TEACHER'),
+    validateMiddleware(QuizSchema.uploadImage),
+    authenticateTeacherMiddleware,
+    QuizController.uploadImage
+);
 
 export { router as QuizRoutes };

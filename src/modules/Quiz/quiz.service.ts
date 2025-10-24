@@ -1,13 +1,15 @@
 import { isObjectEmpty } from '@utils';
 import { QuizRepository } from './quiz.repository';
-import { QuizServiceContract } from './types';
+import { GetQuizUploadUrl, QuizServiceContract } from './types';
 import { QuizOrderBy, QuizUncheckedCreateInput, QuizWhere } from './types';
 import { ForbiddenError, NotFoundError } from '@errors';
 import { UserRepository } from '@modules/User';
 import { QUIZ_COPY_SELECT } from './constants/quiz.constants';
 import { QuizBuilder } from './quiz.builder';
 import { PaginationData } from '#types';
+import { CloudinaryService, FileStorageService } from '@common/file-storage';
 
+const fileStorageService = new FileStorageService(new CloudinaryService());
 export const QuizService: QuizServiceContract = {
     getAllTeacher: async function ({
         select,
@@ -123,6 +125,7 @@ export const QuizService: QuizServiceContract = {
         if (!teacherProfile) {
             throw new ForbiddenError(
                 'Cannot copy quiz without a TeacherProfile.',
+                "NOT_TEACHER"
             );
         }
 
@@ -132,7 +135,7 @@ export const QuizService: QuizServiceContract = {
         });
 
         if (!quizToCopy) {
-            throw new NotFoundError('Quiz to copy not found.');
+            throw new NotFoundError('Quiz to copy not found.', "QUIZ_TO_COPY_NOT_FOUND");
         }
 
         const dataForNewQuiz = QuizBuilder.buildQuizCopyData(
@@ -141,5 +144,17 @@ export const QuizService: QuizServiceContract = {
         );
 
         return this.create(dataForNewQuiz);
+    },
+    async uploadImage(dto) {
+        const uploadData = await fileStorageService.generateUploadUrl({
+            fileType: dto.imageType,
+            folderPath: 'quiz-covers',
+        });
+        const fields = {
+            ...uploadData.fields,
+            uploadUrl: uploadData.url,
+        } as GetQuizUploadUrl;
+
+        return fields;
     },
 };

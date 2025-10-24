@@ -18,16 +18,13 @@ export const validateMiddleware = (schema: AnySchema) =>
             );
             req.query = validated.query;
             req.body = validated.body;
-            req.params = validated.params
+            req.params = validated.params;
 
             return next();
         } catch (error) {
             if (error instanceof YupValidationError) {
-                const validationErrors = error.inner.map((e) => ({
-                    field: e.path,
-                    message: e.message,
-                }));
-                next(new ValidationError(JSON.stringify(validationErrors)));
+                const validationErrors = error.inner.map((e) => e.message);
+                next(new ValidationError(validationErrors));
             }
             next(error);
         }

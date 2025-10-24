@@ -10,7 +10,8 @@
             "@middlewares": ["./src/middlewares"],
             "@errors": ["./src/errors"],
             "@prisma": ["./src/prisma"],
-            "@config": ["./src/config"]
+            "@config": ["./src/config"],
+            "@common/*": ["./src/common/*"]
         },
         "target": "es2016",
         "module": "commonjs",
